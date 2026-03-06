@@ -56,6 +56,7 @@ const AdminSettings = () => {
     showTableInfo: true,
     // Branding - Colors
     logoUrl: '',
+    backgroundImageUrl: '',  // Landing page background image
     primaryColor: '#61B4E5',
     secondaryColor: '#4fa3d1',
     buttonTextColor: '#ffffff',
@@ -115,10 +116,12 @@ const AdminSettings = () => {
   const [activeSection, setActiveSection] = useState('branding');
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingBackgroundImage, setUploadingBackgroundImage] = useState(false);
   const [editingBannerId, setEditingBannerId] = useState(null);
   const [bannerSizeWarning, setBannerSizeWarning] = useState('');
   const logoInputRef = useRef(null);
   const bannerInputRef = useRef(null);
+  const backgroundImageInputRef = useRef(null);
 
   const validateImageDimensions = (src) => {
     setBannerSizeWarning('');
@@ -245,6 +248,7 @@ const AdminSettings = () => {
           showTableInfo: config.showTableInfo,
           // Branding - Colors
           logoUrl: config.logoUrl,
+          backgroundImageUrl: config.backgroundImageUrl,
           primaryColor: config.primaryColor,
           secondaryColor: config.secondaryColor,
           buttonTextColor: config.buttonTextColor,
@@ -529,6 +533,60 @@ const AdminSettings = () => {
               {config.logoUrl && (
                 <div className="image-preview-box" data-testid="logo-preview">
                   <img src={config.logoUrl} alt="Logo preview" className="image-preview-img" onError={(e) => e.target.style.display = 'none'} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Background Image */}
+          <div className="form-group">
+            <label className="form-label">Background Image</label>
+            <span className="form-hint" style={{marginBottom: '8px', display: 'block'}}>Full-screen restaurant ambiance photo for landing page</span>
+            <div className="image-upload-field">
+              <div className="image-url-row">
+                <input
+                  type="url"
+                  className="form-input"
+                  placeholder="https://example.com/restaurant-interior.jpg"
+                  value={config.backgroundImageUrl || ''}
+                  onChange={(e) => handleChange('backgroundImageUrl', e.target.value)}
+                  data-testid="input-backgroundImageUrl"
+                />
+                <input
+                  type="file"
+                  ref={backgroundImageInputRef}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const url = await uploadImage(file, setUploadingBackgroundImage);
+                    if (url) handleChange('backgroundImageUrl', url);
+                    e.target.value = '';
+                  }}
+                />
+                <button
+                  type="button"
+                  className="upload-btn"
+                  onClick={() => backgroundImageInputRef.current?.click()}
+                  disabled={uploadingBackgroundImage}
+                  data-testid="upload-background-btn"
+                >
+                  <IoCloudUploadOutline />
+                  {uploadingBackgroundImage ? 'Uploading...' : 'Upload'}
+                </button>
+              </div>
+              {config.backgroundImageUrl && (
+                <div className="image-preview-box" data-testid="background-preview" style={{marginTop: '12px'}}>
+                  <img src={config.backgroundImageUrl} alt="Background preview" className="image-preview-img" style={{maxHeight: '200px'}} onError={(e) => e.target.style.display = 'none'} />
+                  <button
+                    type="button"
+                    className="remove-image-btn"
+                    onClick={() => handleChange('backgroundImageUrl', '')}
+                    style={{marginTop: '8px', padding: '4px 12px', fontSize: '12px'}}
+                  >
+                    Remove
+                  </button>
                 </div>
               )}
             </div>

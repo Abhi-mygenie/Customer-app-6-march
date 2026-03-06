@@ -20,7 +20,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { restaurantId } = useRestaurantId();
   const { isAuthenticated } = useAuth();
-  const { fetchConfig, showCallWaiter: configShowCallWaiter, showPayBill: configShowPayBill, showFooter: configShowFooter, showLogo: configShowLogo, showWelcomeText: configShowWelcomeText, showDescription: configShowDescription, showSocialIcons: configShowSocialIcons, showTableNumber: configShowTableNumber, showPoweredBy: configShowPoweredBy, showLandingCustomerCapture: configShowLandingCustomerCapture, showHamburgerMenu: configShowHamburgerMenu, showLoginButton: configShowLoginButton, logoUrl: configLogoUrl, primaryColor: configPrimaryColor, buttonTextColor: configButtonTextColor, welcomeMessage: configWelcomeMessage, tagline: configTagline, banners: configBanners, instagramUrl: configInstagramUrl, facebookUrl: configFacebookUrl, twitterUrl: configTwitterUrl, youtubeUrl: configYoutubeUrl, whatsappNumber: configWhatsappNumber, phone: configPhone } = useRestaurantConfig();
+  const { fetchConfig, showCallWaiter: configShowCallWaiter, showPayBill: configShowPayBill, showFooter: configShowFooter, showLogo: configShowLogo, showWelcomeText: configShowWelcomeText, showDescription: configShowDescription, showSocialIcons: configShowSocialIcons, showTableNumber: configShowTableNumber, showPoweredBy: configShowPoweredBy, showLandingCustomerCapture: configShowLandingCustomerCapture, showHamburgerMenu: configShowHamburgerMenu, showLoginButton: configShowLoginButton, logoUrl: configLogoUrl, backgroundImageUrl: configBackgroundImageUrl, primaryColor: configPrimaryColor, buttonTextColor: configButtonTextColor, welcomeMessage: configWelcomeMessage, tagline: configTagline, banners: configBanners, instagramUrl: configInstagramUrl, facebookUrl: configFacebookUrl, twitterUrl: configTwitterUrl, youtubeUrl: configYoutubeUrl, whatsappNumber: configWhatsappNumber, phone: configPhone } = useRestaurantConfig();
 
   const { tableNo: scannedTableNo, roomOrTable: scannedRoomOrTable, isScanned } = useScannedTable();
 
@@ -124,8 +124,20 @@ const LandingPage = () => {
     navigate('/login', { state: { phone, restaurantId } });
   };
 
+  // Check if we have a background image
+  const hasBackgroundImage = !!configBackgroundImageUrl;
+
   return (
-    <div className="landing-page" data-testid="landing-page">
+    <div 
+      className={`landing-page ${hasBackgroundImage ? 'has-background-image' : ''}`} 
+      data-testid="landing-page"
+      style={hasBackgroundImage ? {
+        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%), url(${configBackgroundImageUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      } : {}}
+    >
       {/* Hamburger Menu - Controlled by config */}
       {configShowHamburgerMenu !== false && (
         <div className="landing-hamburger-wrapper">
@@ -137,9 +149,12 @@ const LandingPage = () => {
       {!isAuthenticated && configShowLoginButton !== false && (
         <div className="landing-login-wrapper">
           <button 
-            className="landing-login-btn" 
+            className={`landing-login-btn ${hasBackgroundImage ? 'on-image' : ''}`}
             onClick={() => navigate('/login')}
-            style={{ 
+            style={hasBackgroundImage ? {
+              borderColor: '#ffffff',
+              color: '#ffffff'
+            } : { 
               borderColor: btnColor,
               color: btnColor 
             }}
@@ -183,13 +198,13 @@ const LandingPage = () => {
 
         {/* 3. Description - uses tagline from local config */}
         {showDescription && (
-          <p className="description-text" data-testid="landing-description">
+          <p className={`description-text ${hasBackgroundImage ? 'on-image' : ''}`} data-testid="landing-description">
             {tagline}
           </p>
         )}
 
-        {/* 3.2 Admin Config Banners (Local only - POS promotions ignored) */}
-        {configBanners.length > 0 && (
+        {/* 3.2 Admin Config Banners - Show only when NO background image */}
+        {!hasBackgroundImage && configBanners.length > 0 && (
           <div className="config-banner-carousel" data-testid="config-banner-carousel">
             <PromoBanner
               promotions={configBanners.map((b, i) => ({

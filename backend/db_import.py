@@ -44,7 +44,7 @@ def import_all(drop_existing=False):
     client = MongoClient(MONGO_URL)
     db = client[DB_NAME]
 
-    json_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".json") and f != "_manifest.json"]
+    json_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".json") and f not in ["_manifest.json", "_export_metadata.json"]]
 
     if not json_files:
         print("No JSON files found in db_data/")
@@ -63,7 +63,7 @@ def import_all(drop_existing=False):
         with open(filepath, "r") as f:
             docs = json.load(f)
 
-        if not docs:
+        if not docs or len(docs) == 0:
             print(f"  Skipped {col_name}: empty file")
             continue
 

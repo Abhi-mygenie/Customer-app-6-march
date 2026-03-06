@@ -213,6 +213,12 @@ const ReviewOrder = () => {
     return loyaltyEnabled && isCustomerDetailsFilled;
   }, [restaurant, isCustomerDetailsFilled]);
 
+  // Check if online ordering is enabled
+  const isOnlineOrderEnabled = useMemo(() => {
+    if (!restaurant) return true; // Default to enabled if no data
+    return restaurant.online_order === 'Yes';
+  }, [restaurant]);
+
   // Check if restaurant is 716 (table number required)
   const isRestaurant716 = isMultipleMenu(restaurant, restaurantId);
 
@@ -910,13 +916,19 @@ const ReviewOrder = () => {
 
         {/* Place Order Button */}
         <div className="review-order-footer">
-          <button
-            className="review-order-place-btn"
-            onClick={handlePlaceOrder}
-            disabled={totalItems === 0 || isPlacingOrder || isLoadingToken}
-          >
-            {isPlacingOrder ? 'Placing Order...' : `Place Order ₹${totalToPay.toFixed(2)}`}
-          </button>
+          {!isOnlineOrderEnabled ? (
+            <div className="online-order-disabled-message">
+              <p>Online ordering is currently unavailable for this restaurant.</p>
+            </div>
+          ) : (
+            <button
+              className="review-order-place-btn"
+              onClick={handlePlaceOrder}
+              disabled={totalItems === 0 || isPlacingOrder || isLoadingToken}
+            >
+              {isPlacingOrder ? 'Placing Order...' : `Place Order ₹${totalToPay.toFixed(2)}`}
+            </button>
+          )}
         </div>
       </div>
     </div>

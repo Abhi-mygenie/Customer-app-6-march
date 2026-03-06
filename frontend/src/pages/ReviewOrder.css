@@ -996,3 +996,20 @@
   color: var(--color-primary);
 }
 
+
+/* Online Order Disabled Message */
+.online-order-disabled-message {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+.online-order-disabled-message p {
+  margin: 0;
+  color: #856404;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}

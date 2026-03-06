@@ -8,7 +8,7 @@ Pull and build https://github.com/Abhi-mygenie/customer-app5th-march.git
 - **Backend**: FastAPI with MongoDB
 - **External API**: MyGenie POS API (manage.mygenie.online)
 
-## What's Been Implemented (March 6, 2026)
+## What's Been Implemented (March 6, 2026 – Updated)
 
 ### Initial Setup
 - Cloned GitHub repository
@@ -55,9 +55,16 @@ REACT_APP_IMAGE_BASE_URL=https://manage.mygenie.online
 - `/app/backend/db_import.py`
 - `/app/backend/seed_demo_data.py`
 
-## Next Action Items
-- None - all requested changes complete
+### Admin Panel Toggles (March 6, 2026)
+6. **`showHamburgerMenu` toggle** - Admin can show/hide hamburger menu on landing page
+7. **`showLoginButton` toggle** - Admin can show/hide login button on landing page
+8. **`backgroundImageUrl` field** - Admin can set a full-screen background image for the landing page (with dark overlay for readability)
+9. **Young Monk Cafe (ID: 709)** - Seeded sample background image in DB; visually confirmed working ✅
 
-## Backlog/Future
-- Add `.npmrc` with `legacy-peer-deps=true` for easier local npm installs
-- Disable visual-edits plugin for local development (`enableVisualEdits: false` in craco.config.js)
+## Next Action Items
+- None - all requested changes complete and verified
+
+## Backlog/Future (P1/P2)
+- **P1:** Add `.npmrc` with `legacy-peer-deps=true` for easier local npm installs
+- **P1:** Disable visual-edits plugin for local dev (`enableVisualEdits: false` in craco.config.js)
+- **P2:** React Native + Expo migration (8-week plan available on request)

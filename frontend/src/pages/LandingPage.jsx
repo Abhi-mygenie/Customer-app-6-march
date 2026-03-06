@@ -75,9 +75,8 @@ const LandingPage = () => {
   }
 
   const restaurantName = restaurant?.name || 'MyGenie';
-  const description = restaurant?.description
-    ? restaurant.description.replace(/'/g, '')
-    : '';
+  // Tagline from local config only (not from MyGenie API)
+  const tagline = configTagline || '';
   // Logo from local config only (no POS fallback)
   const logoUrl = configLogoUrl || '/assets/images/ic_login_logo.png';
   const phone = configPhone || restaurant?.phone || '';
@@ -91,7 +90,7 @@ const LandingPage = () => {
   // All visibility controlled by admin config (defaults to true)
   const showLogo = configShowLogo;
   const showWelcome = configShowWelcomeText;
-  const showDescription = configShowDescription && description;
+  const showDescription = configShowDescription && tagline;
   const showSocial = configShowSocialIcons && (phone || instagramUrl || facebookUrl || twitterUrl || youtubeUrl || whatsappNumber);
   const showTable = configShowTableNumber && isScanned && scannedTableNo;
   const showBrowseMenu = !configShowLandingCustomerCapture; // Hide if customer capture is ON
@@ -180,10 +179,10 @@ const LandingPage = () => {
           </p>
         )}
 
-        {/* 3. Description */}
+        {/* 3. Description - uses tagline from local config */}
         {showDescription && (
           <p className="description-text" data-testid="landing-description">
-            {description}
+            {tagline}
           </p>
         )}
 

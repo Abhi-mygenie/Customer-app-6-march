@@ -79,18 +79,21 @@ const ReviewOrder = () => {
 
   const { cartItems, getTotalItems, getTotalPrice, clearCart } = useCart();
 
-  // Fetch restaurant details
+  // Fetch restaurant details FIRST to get numeric ID
   const { restaurant } = useRestaurantDetails(restaurantId);
+  
+  // Use numeric ID from restaurant-info response, fallback to restaurantId
+  const numericRestaurantId = restaurant?.id?.toString() || restaurantId;
 
   // Fetch admin config
   useEffect(() => {
-    if (restaurantId) {
-      fetchConfig(restaurantId);
+    if (numericRestaurantId) {
+      fetchConfig(numericRestaurantId);
     }
-  }, [restaurantId, fetchConfig]);
+  }, [numericRestaurantId, fetchConfig]);
 
-  // Fetch table/room configuration
-  const { rooms, tables, loading: tablesLoading, error: tablesError, errorMessage: tablesErrorMessage } = useTableConfig(restaurantId);
+  // Fetch table/room configuration (uses numeric ID)
+  const { rooms, tables, loading: tablesLoading, error: tablesError, errorMessage: tablesErrorMessage } = useTableConfig(numericRestaurantId);
 
   // Scanned table from QR code
   const {

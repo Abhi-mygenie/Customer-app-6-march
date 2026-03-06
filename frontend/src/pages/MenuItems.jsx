@@ -42,14 +42,17 @@ const MenuItems = () => {
   const categoryHeaderRef = useRef(null);
 
 
-  // Fetch menu sections from API
-  const { menuSections, loading: menuLoading, error: menuError, errorMessage: menuErrorMessage } = useMenuSections(stationId, restaurantId);
+  // Fetch restaurant details FIRST to get numeric ID
+  const { restaurant, loading: restaurantLoading, isFetching: restaurantFetching } = useRestaurantDetails(restaurantId);
+  
+  // Use numeric ID from restaurant-info response, fallback to restaurantId
+  const numericRestaurantId = restaurant?.id?.toString() || restaurantId;
+
+  // Fetch menu sections from API (wait for numeric ID)
+  const { menuSections, loading: menuLoading, error: menuError, errorMessage: menuErrorMessage } = useMenuSections(stationId, numericRestaurantId);
 
   // Fetch stations for menu panel
-  const { stations: stationsData } = useStations(restaurantId);
-
-  // Fetch restaurant details for dynamic brand text
-  const { restaurant, loading: restaurantLoading, isFetching: restaurantFetching } = useRestaurantDetails(restaurantId, stationsData);
+  const { stations: stationsData } = useStations(numericRestaurantId);
 
   // Check if online ordering is enabled
   const isOnlineOrderEnabled = restaurant?.online_order === 'Yes' || restaurant?.online_order === undefined;

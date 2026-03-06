@@ -56,7 +56,8 @@ const AdminSettings = () => {
     showTableInfo: true,
     // Branding - Colors
     logoUrl: '',
-    backgroundImageUrl: '',  // Landing page background image
+    backgroundImageUrl: '',          // Desktop background image
+    mobileBackgroundImageUrl: '',    // Mobile background image (portrait 9:16)
     primaryColor: '#61B4E5',
     secondaryColor: '#4fa3d1',
     buttonTextColor: '#ffffff',
@@ -117,11 +118,13 @@ const AdminSettings = () => {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [uploadingBackgroundImage, setUploadingBackgroundImage] = useState(false);
+  const [uploadingMobileBackgroundImage, setUploadingMobileBackgroundImage] = useState(false);
   const [editingBannerId, setEditingBannerId] = useState(null);
   const [bannerSizeWarning, setBannerSizeWarning] = useState('');
   const logoInputRef = useRef(null);
   const bannerInputRef = useRef(null);
   const backgroundImageInputRef = useRef(null);
+  const mobileBackgroundImageInputRef = useRef(null);
 
   const validateImageDimensions = (src) => {
     setBannerSizeWarning('');
@@ -235,7 +238,6 @@ const AdminSettings = () => {
           showLandingCustomerCapture: config.showLandingCustomerCapture,
           showHamburgerMenu: config.showHamburgerMenu,
           showLoginButton: config.showLoginButton,
-          // Menu Page Visibility
           showPromotionsOnMenu: config.showPromotionsOnMenu,
           showCategories: config.showCategories,
           // Order Page Visibility
@@ -249,6 +251,7 @@ const AdminSettings = () => {
           // Branding - Colors
           logoUrl: config.logoUrl,
           backgroundImageUrl: config.backgroundImageUrl,
+          mobileBackgroundImageUrl: config.mobileBackgroundImageUrl,
           primaryColor: config.primaryColor,
           secondaryColor: config.secondaryColor,
           buttonTextColor: config.buttonTextColor,
@@ -583,6 +586,61 @@ const AdminSettings = () => {
                     type="button"
                     className="remove-image-btn"
                     onClick={() => handleChange('backgroundImageUrl', '')}
+                    style={{marginTop: '8px', padding: '4px 12px', fontSize: '12px'}}
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Background Image */}
+          <div className="form-group">
+            <label className="form-label">Mobile Background Image <span style={{fontSize:'11px', color:'#888', fontWeight:400}}>(portrait, 9:16 ratio)</span></label>
+            <span className="form-hint" style={{marginBottom: '8px', display: 'block'}}>Shown on phones (&lt;480px wide). Falls back to desktop image if not set.</span>
+            <div className="image-upload-field">
+              <div className="image-url-row">
+                <input
+                  type="url"
+                  className="form-input"
+                  placeholder="https://example.com/restaurant-mobile.jpg"
+                  value={config.mobileBackgroundImageUrl || ''}
+                  onChange={(e) => handleChange('mobileBackgroundImageUrl', e.target.value)}
+                  data-testid="input-mobileBackgroundImageUrl"
+                />
+                <input
+                  type="file"
+                  ref={mobileBackgroundImageInputRef}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const url = await uploadImage(file, setUploadingMobileBackgroundImage);
+                    if (url) handleChange('mobileBackgroundImageUrl', url);
+                    e.target.value = '';
+                  }}
+                />
+                <button
+                  type="button"
+                  className="upload-btn"
+                  onClick={() => mobileBackgroundImageInputRef.current?.click()}
+                  disabled={uploadingMobileBackgroundImage}
+                  data-testid="upload-mobile-background-btn"
+                >
+                  <IoCloudUploadOutline />
+                  {uploadingMobileBackgroundImage ? 'Uploading...' : 'Upload'}
+                </button>
+              </div>
+              <span className="form-hint">Recommended: 1080 x 1920px (9:16 ratio). Max 5MB.</span>
+              {config.mobileBackgroundImageUrl && (
+                <div className="image-preview-box" data-testid="mobile-background-preview" style={{marginTop: '12px'}}>
+                  <img src={config.mobileBackgroundImageUrl} alt="Mobile background preview" className="image-preview-img" style={{maxHeight: '200px'}} onError={(e) => e.target.style.display = 'none'} />
+                  <button
+                    type="button"
+                    className="remove-image-btn"
+                    onClick={() => handleChange('mobileBackgroundImageUrl', '')}
                     style={{marginTop: '8px', padding: '4px 12px', fontSize: '12px'}}
                   >
                     Remove

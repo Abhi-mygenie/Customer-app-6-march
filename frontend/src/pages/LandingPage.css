@@ -24,7 +24,20 @@
 .landing-page.has-background-image {
   justify-content: center;
   padding-top: 60px;
+  background-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%), var(--landing-bg-desktop);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+/* Mobile: use portrait image, no fixed attachment (causes issues on iOS) */
+@media (max-width: 480px) {
+  .landing-page.has-background-image {
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%), var(--landing-bg-mobile);
+    background-attachment: scroll;
+    background-position: center top;
+  }
 }
 
 .landing-page.has-background-image .landing-container {

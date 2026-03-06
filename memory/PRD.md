@@ -59,7 +59,12 @@ REACT_APP_IMAGE_BASE_URL=https://manage.mygenie.online
 6. **`showHamburgerMenu` toggle** - Admin can show/hide hamburger menu on landing page
 7. **`showLoginButton` toggle** - Admin can show/hide login button on landing page
 8. **`backgroundImageUrl` field** - Admin can set a full-screen background image for the landing page (with dark overlay for readability)
-9. **Young Monk Cafe (ID: 709)** - Seeded sample background image in DB; visually confirmed working ✅
+9. **`mobileBackgroundImageUrl` field** - Admin can upload a separate portrait (9:16) image for phones ≤480px wide. Falls back to desktop image if not set.
+10. Young Monk Cafe (ID: 709) - Seeded sample background image in DB; visually confirmed working ✅
+
+### Backend Model Fix (March 6, 2026)
+- Added missing fields to `AppConfigUpdate` Pydantic model: `backgroundImageUrl`, `mobileBackgroundImageUrl`, `showHamburgerMenu`, `showLoginButton`, `showEstimatedTimes`
+- These were silently ignored before; now correctly persisted via PUT /api/config/
 
 ## Next Action Items
 - None - all requested changes complete and verified

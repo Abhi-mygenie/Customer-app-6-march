@@ -129,8 +129,14 @@ class AppConfigUpdate(BaseModel):
     showSpecialInstructions: Optional[bool] = None
     showPriceBreakdown: Optional[bool] = None
     showTableInfo: Optional[bool] = None
+    # Visibility toggles (missing from original model)
+    showHamburgerMenu: Optional[bool] = None
+    showLoginButton: Optional[bool] = None
+    showEstimatedTimes: Optional[bool] = None
     # Branding - Colors
     logoUrl: Optional[str] = None
+    backgroundImageUrl: Optional[str] = None
+    mobileBackgroundImageUrl: Optional[str] = None
     primaryColor: Optional[str] = None
     secondaryColor: Optional[str] = None
     buttonTextColor: Optional[str] = None

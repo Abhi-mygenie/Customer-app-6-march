@@ -20,7 +20,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { restaurantId } = useRestaurantId();
   const { isAuthenticated } = useAuth();
-  const { fetchConfig, showCallWaiter: configShowCallWaiter, showPayBill: configShowPayBill, showFooter: configShowFooter, showLogo: configShowLogo, showWelcomeText: configShowWelcomeText, showDescription: configShowDescription, showSocialIcons: configShowSocialIcons, showTableNumber: configShowTableNumber, showPoweredBy: configShowPoweredBy, showLandingCustomerCapture: configShowLandingCustomerCapture, showHamburgerMenu: configShowHamburgerMenu, showLoginButton: configShowLoginButton, logoUrl: configLogoUrl, backgroundImageUrl: configBackgroundImageUrl, primaryColor: configPrimaryColor, buttonTextColor: configButtonTextColor, welcomeMessage: configWelcomeMessage, tagline: configTagline, banners: configBanners, instagramUrl: configInstagramUrl, facebookUrl: configFacebookUrl, twitterUrl: configTwitterUrl, youtubeUrl: configYoutubeUrl, whatsappNumber: configWhatsappNumber, phone: configPhone } = useRestaurantConfig();
+  const { fetchConfig, showCallWaiter: configShowCallWaiter, showPayBill: configShowPayBill, showFooter: configShowFooter, showLogo: configShowLogo, showWelcomeText: configShowWelcomeText, showDescription: configShowDescription, showSocialIcons: configShowSocialIcons, showTableNumber: configShowTableNumber, showPoweredBy: configShowPoweredBy, showLandingCustomerCapture: configShowLandingCustomerCapture, showHamburgerMenu: configShowHamburgerMenu, showLoginButton: configShowLoginButton, logoUrl: configLogoUrl, backgroundImageUrl: configBackgroundImageUrl, mobileBackgroundImageUrl: configMobileBackgroundImageUrl, primaryColor: configPrimaryColor, buttonTextColor: configButtonTextColor, welcomeMessage: configWelcomeMessage, tagline: configTagline, banners: configBanners, instagramUrl: configInstagramUrl, facebookUrl: configFacebookUrl, twitterUrl: configTwitterUrl, youtubeUrl: configYoutubeUrl, whatsappNumber: configWhatsappNumber, phone: configPhone } = useRestaurantConfig();
 
   const { tableNo: scannedTableNo, roomOrTable: scannedRoomOrTable, isScanned } = useScannedTable();
 
@@ -126,16 +126,16 @@ const LandingPage = () => {
 
   // Check if we have a background image
   const hasBackgroundImage = !!configBackgroundImageUrl;
+  // Mobile image falls back to desktop if not set
+  const mobileImg = configMobileBackgroundImageUrl || configBackgroundImageUrl;
 
   return (
     <div 
       className={`landing-page ${hasBackgroundImage ? 'has-background-image' : ''}`} 
       data-testid="landing-page"
       style={hasBackgroundImage ? {
-        backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%), url(${configBackgroundImageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
+        '--landing-bg-desktop': `url(${configBackgroundImageUrl})`,
+        '--landing-bg-mobile': `url(${mobileImg})`,
       } : {}}
     >
       {/* Hamburger Menu - Controlled by config */}

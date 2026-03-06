@@ -34,7 +34,8 @@ const DEFAULT_CONFIG = {
   showTableInfo: true,
   // Branding - Colors
   logoUrl: null,
-  backgroundImageUrl: null,  // Landing page background image
+  backgroundImageUrl: null,          // Desktop landing page background image
+  mobileBackgroundImageUrl: null,    // Mobile landing page background image (9:16)
   primaryColor: null,
   secondaryColor: null,
   buttonTextColor: null,
@@ -247,7 +248,8 @@ export const RestaurantConfigProvider = ({ children }) => {
     showTableInfo: isOn('showTableInfo'),
     // Branding - Colors
     logoUrl: config.logoUrl,
-    backgroundImageUrl: config.backgroundImageUrl,  // Landing page background image
+    backgroundImageUrl: config.backgroundImageUrl,
+    mobileBackgroundImageUrl: config.mobileBackgroundImageUrl,
     primaryColor: config.primaryColor,
     secondaryColor: config.secondaryColor,
     buttonTextColor: config.buttonTextColor,

@@ -51,6 +51,9 @@ const MenuItems = () => {
   // Fetch restaurant details for dynamic brand text
   const { restaurant, loading: restaurantLoading, isFetching: restaurantFetching } = useRestaurantDetails(restaurantId, stationsData);
 
+  // Check if online ordering is enabled
+  const isOnlineOrderEnabled = restaurant?.online_order === 'Yes' || restaurant?.online_order === undefined;
+
   // Fetch admin config for this restaurant
   useEffect(() => {
     if (restaurantId) {
@@ -620,6 +623,7 @@ const MenuItems = () => {
                                     onIncrement={() => handleIncrement(item)}
                                     onDecrement={() => handleDecrement(item)}
                                     currentTimeInSeconds={currentTimeInSeconds}
+                                    isOnlineOrderEnabled={isOnlineOrderEnabled}
                                   />
                                 );
                               })}

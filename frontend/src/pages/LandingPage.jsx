@@ -20,7 +20,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { restaurantId } = useRestaurantId();
   const { isAuthenticated } = useAuth();
-  const { fetchConfig, showCallWaiter: configShowCallWaiter, showPayBill: configShowPayBill, showFooter: configShowFooter, showLogo: configShowLogo, showWelcomeText: configShowWelcomeText, showDescription: configShowDescription, showSocialIcons: configShowSocialIcons, showTableNumber: configShowTableNumber, showPoweredBy: configShowPoweredBy, showLandingCustomerCapture: configShowLandingCustomerCapture, logoUrl: configLogoUrl, primaryColor: configPrimaryColor, buttonTextColor: configButtonTextColor, welcomeMessage: configWelcomeMessage, tagline: configTagline, banners: configBanners, instagramUrl: configInstagramUrl, facebookUrl: configFacebookUrl, twitterUrl: configTwitterUrl, youtubeUrl: configYoutubeUrl, whatsappNumber: configWhatsappNumber, phone: configPhone } = useRestaurantConfig();
+  const { fetchConfig, showCallWaiter: configShowCallWaiter, showPayBill: configShowPayBill, showFooter: configShowFooter, showLogo: configShowLogo, showWelcomeText: configShowWelcomeText, showDescription: configShowDescription, showSocialIcons: configShowSocialIcons, showTableNumber: configShowTableNumber, showPoweredBy: configShowPoweredBy, showLandingCustomerCapture: configShowLandingCustomerCapture, showHamburgerMenu: configShowHamburgerMenu, showLoginButton: configShowLoginButton, logoUrl: configLogoUrl, primaryColor: configPrimaryColor, buttonTextColor: configButtonTextColor, welcomeMessage: configWelcomeMessage, tagline: configTagline, banners: configBanners, instagramUrl: configInstagramUrl, facebookUrl: configFacebookUrl, twitterUrl: configTwitterUrl, youtubeUrl: configYoutubeUrl, whatsappNumber: configWhatsappNumber, phone: configPhone } = useRestaurantConfig();
 
   const { tableNo: scannedTableNo, roomOrTable: scannedRoomOrTable, isScanned } = useScannedTable();
 
@@ -126,13 +126,15 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page" data-testid="landing-page">
-      {/* Hamburger Menu - Always on top left */}
-      <div className="landing-hamburger-wrapper">
-        <HamburgerMenu restaurantName={restaurant?.name} phone={phone} />
-      </div>
+      {/* Hamburger Menu - Controlled by config */}
+      {configShowHamburgerMenu !== false && (
+        <div className="landing-hamburger-wrapper">
+          <HamburgerMenu restaurantName={restaurant?.name} phone={phone} />
+        </div>
+      )}
 
-      {/* Login Button - Top right only if not logged in */}
-      {!isAuthenticated && (
+      {/* Login Button - Top right only if not logged in and config allows */}
+      {!isAuthenticated && configShowLoginButton !== false && (
         <div className="landing-login-wrapper">
           <button 
             className="landing-login-btn" 

@@ -42,6 +42,8 @@ const VisibilityTab = ({ ToggleRow }) => {
           </h3>
           <p className="section-description">Control what elements are visible on the landing page</p>
           <div className="toggle-list">
+            <ToggleRow field="showHamburgerMenu" label="Hamburger Menu" />
+            <ToggleRow field="showLoginButton" label="Login Button" />
             <ToggleRow field="showLogo" label="Restaurant Logo" />
             <ToggleRow field="showWelcomeText" label="Welcome Message" />
             <ToggleRow field="showDescription" label="Restaurant Description" />

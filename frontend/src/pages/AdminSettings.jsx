@@ -41,6 +41,8 @@ const AdminSettings = () => {
     showAboutUs: true,
     showFooter: true,
     showLandingCustomerCapture: false,  // Capture name/phone on landing
+    showHamburgerMenu: true,  // Show hamburger menu
+    showLoginButton: true,    // Show login button on landing
     // Menu Page Visibility
     showPromotionsOnMenu: true,
     showCategories: true,
@@ -228,6 +230,8 @@ const AdminSettings = () => {
           showAboutUs: config.showAboutUs,
           showFooter: config.showFooter,
           showLandingCustomerCapture: config.showLandingCustomerCapture,
+          showHamburgerMenu: config.showHamburgerMenu,
+          showLoginButton: config.showLoginButton,
           // Menu Page Visibility
           showPromotionsOnMenu: config.showPromotionsOnMenu,
           showCategories: config.showCategories,

@@ -157,7 +157,7 @@ class EditOrderAPITester:
 
 def main():
     # Get backend URL from environment or use default
-    backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://app-6-march.preview.emergentagent.com')
+    backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://food-status-system.preview.emergentagent.com')
     
     print("=" * 60)
     print("🧪 EDIT ORDER FEATURE - BACKEND API TESTING")

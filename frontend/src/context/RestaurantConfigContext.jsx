@@ -170,19 +170,24 @@ export const RestaurantConfigProvider = ({ children }) => {
       root.style.setProperty('--font-body', fontMap[font] || font);
     }
     
-    // Border Radius - Only affects buttons and badges, NOT containers/inputs
+    // Border Radius - affects buttons, badges AND containers proportionally
     if (config.borderRadius) {
       const radiusMap = {
-        'sharp': { button: '0px', badge: '0px' },
-        'slightly-rounded': { button: '4px', badge: '6px' },
-        'rounded': { button: '8px', badge: '12px' },
-        'very-rounded': { button: '12px', badge: '16px' },
-        'pill': { button: '9999px', badge: '9999px' },
+        //                   button    badge   sm    md     lg     xl
+        'sharp':          { button: '0px',    badge: '0px',    sm: '0px',  md: '0px',  lg: '0px',  xl: '0px'  },
+        'slightly-rounded':{ button: '4px',   badge: '6px',    sm: '2px',  md: '4px',  lg: '6px',  xl: '8px'  },
+        'rounded':         { button: '8px',   badge: '12px',   sm: '4px',  md: '8px',  lg: '12px', xl: '16px' },
+        'very-rounded':    { button: '12px',  badge: '16px',   sm: '6px',  md: '12px', lg: '16px', xl: '20px' },
+        'pill':            { button: '9999px',badge: '9999px', sm: '8px',  md: '14px', lg: '18px', xl: '24px' },
       };
       const radii = radiusMap[config.borderRadius];
       if (radii) {
         root.style.setProperty('--radius-button', radii.button);
         root.style.setProperty('--radius-badge', radii.badge);
+        root.style.setProperty('--radius-container-sm', radii.sm);
+        root.style.setProperty('--radius-container-md', radii.md);
+        root.style.setProperty('--radius-container-lg', radii.lg);
+        root.style.setProperty('--radius-container-xl', radii.xl);
       }
     }
     
@@ -205,6 +210,10 @@ export const RestaurantConfigProvider = ({ children }) => {
       root.style.removeProperty('--font-body');
       root.style.removeProperty('--radius-button');
       root.style.removeProperty('--radius-badge');
+      root.style.removeProperty('--radius-container-sm');
+      root.style.removeProperty('--radius-container-md');
+      root.style.removeProperty('--radius-container-lg');
+      root.style.removeProperty('--radius-container-xl');
       root.style.removeProperty('--text-blue-hero');
       root.style.removeProperty('--text-blue-dark');
       root.style.removeProperty('--text-blue-medium');

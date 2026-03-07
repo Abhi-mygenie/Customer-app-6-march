@@ -186,8 +186,8 @@ const AdminSettings = () => {
   const fetchConfig = async () => {
     if (!user?.id) return;
     
-    // Use restaurant_id field if available, fallback to user id
-    const configId = user.restaurant_id || user.id;
+    // Use restaurant_name (URL slug) for config - matches what customers use
+    const configId = user.restaurant_name?.toLowerCase() || user.restaurant_id || user.id;
     
     setLoading(true);
     try {
@@ -249,6 +249,8 @@ const AdminSettings = () => {
           showSpecialInstructions: config.showSpecialInstructions,
           showPriceBreakdown: config.showPriceBreakdown,
           showTableInfo: config.showTableInfo,
+          // Order Status Page Visibility
+          showFoodStatus: config.showFoodStatus,
           // Branding - Colors
           logoUrl: config.logoUrl,
           backgroundImageUrl: config.backgroundImageUrl,

@@ -1,75 +1,74 @@
-# Customer App - PRD
+# Customer App - MyGenie POS Integration
 
 ## Original Problem Statement
-Pull and build https://github.com/Abhi-mygenie/customer-app5th-march.git
+Pull and build the Customer App from https://github.com/Abhi-mygenie/Customer-app-6-march as is.
 
 ## Architecture
-- **Frontend**: React 19 with Tailwind CSS
-- **Backend**: FastAPI with MongoDB
-- **External API**: MyGenie POS API (manage.mygenie.online)
+- **Frontend**: React.js with Tailwind CSS
+- **Backend**: FastAPI (Python)
+- **Database**: MongoDB (local) + External MyGenie API (preprod.mygenie.online)
+- **Environment**: Emergent Platform
 
-## What's Been Implemented (March 6, 2026 – Updated)
+## User Personas
+1. **Restaurant Admin** - Manages branding, banners, visibility settings
+2. **Customer** - Browses menu, places orders, edits existing orders
 
-### Initial Setup
-- Cloned GitHub repository
-- Installed dependencies (yarn/pip)
-- Imported database from CRMV1 (14 collections)
-- Seeded demo data (295 orders, 1026 order items)
+## Core Requirements (Static)
+- Restaurant menu display with categories
+- Cart functionality with add/remove items
+- Order placement workflow
+- Admin settings panel (Branding, Banners, Content, Visibility)
+- Border radius customization for UI elements
 
-### Code Changes Made
-1. **`online_order` field** - Controls ADD button visibility (Yes/No)
-2. **`multiple_menus` field** - Renamed from `menu_type`, uses Yes/No values
-3. **Tagline from local** - Uses `config.tagline` instead of `restaurant.description`
-4. **Production API endpoints** - Updated to `manage.mygenie.online/api/v1`
-5. **Fixed API flow** - Wait for `restaurant.id` from restaurant-info before calling other APIs
+## What's Been Implemented
 
-### MyGenie API Fields Used (Final)
-| Field | Values | Purpose |
-|-------|--------|---------|
-| `id` | Number | Restaurant ID for other APIs |
-| `name` | String | Restaurant name |
-| `is_loyalty` | Yes/No | Show loyalty features |
-| `is_coupon` | Yes/No | Show coupon features |
-| `multiple_menus` | Yes/No | Single or multiple menus |
-| `online_order` | Yes/No | Show/hide ADD button |
+### Session 1 (March 7, 2026)
+1. **Initial Setup** - Cloned repo, imported database, configured environment
+2. **Menu Tab in Admin Settings** - Added 5th tab to navigate back to menu
+3. **Admin Settings Button in Header** - Shows "Settings" button for logged-in admins
+4. **Border Radius Fix** - All buttons/containers now respect admin border radius setting
+5. **Environment Switch** - Switched from production to preprod API
 
-### Environment Variables
-```
-REACT_APP_API_BASE_URL=https://manage.mygenie.online/api/v1
-REACT_APP_IMAGE_BASE_URL=https://manage.mygenie.online
-```
+### Session 2 (March 7, 2026) - Edit Order Feature
+1. **API Integration** (`/api/air-bnb/get-order-details/{orderId}`)
+2. **CartContext Extended** - Added edit mode state management:
+   - `isEditMode`, `editingOrderId`, `previousOrderItems`
+   - `startEditOrder()`, `clearEditMode()`, `getEditOrderPayload()`
+3. **PreviousOrderItems Component** - Read-only display of previous order items
+4. **ReviewOrder Page Updates** - Split view showing:
+   - "Previously Ordered" section (locked items)
+   - "New Items" section (editable)
+   - Combined price breakdown with Grand Total
+5. **Menu Page Edit Banner** - Shows "Adding items to Order #XXXXX" with Cancel button
+6. **OrderSuccess Page** - Edit Order button triggers the flow
 
-## API Flow (Preprod vs Production)
-- **Preprod**: Uses numeric ID directly (e.g., `478`)
-- **Production**: Uses subdomain (e.g., `fivestar.mygenie.online`) → calls restaurant-info → gets numeric ID → uses for other APIs
+## API Endpoints
+- `GET /api/air-bnb/get-order-details/{orderId}` - Fetch order details for editing
+- `POST /api/customer/order/place` - Place new order
+- `GET /api/web/restaurant-info` - Get restaurant details
 
-## Files Modified
-- `/app/frontend/.env`
-- `/app/frontend/src/pages/MenuItems.jsx`
-- `/app/frontend/src/pages/ReviewOrder.jsx`
-- `/app/frontend/src/pages/DiningMenu.jsx`
-- `/app/frontend/src/pages/LandingPage.jsx`
-- `/app/frontend/src/pages/AboutUs.jsx`
-- `/app/frontend/src/components/MenuItem/MenuItem.jsx`
-- `/app/frontend/src/api/utils/restaurantIdConfig.js`
-- `/app/backend/db_import.py`
-- `/app/backend/seed_demo_data.py`
+## Prioritized Backlog
 
-### Admin Panel Toggles (March 6, 2026)
-6. **`showHamburgerMenu` toggle** - Admin can show/hide hamburger menu on landing page
-7. **`showLoginButton` toggle** - Admin can show/hide login button on landing page
-8. **`backgroundImageUrl` field** - Admin can set a full-screen background image for the landing page (with dark overlay for readability)
-9. **`mobileBackgroundImageUrl` field** - Admin can upload a separate portrait (9:16) image for phones ≤480px wide. Falls back to desktop image if not set.
-10. Young Monk Cafe (ID: 709) - Seeded sample background image in DB; visually confirmed working ✅
+### P0 (Critical)
+- [ ] Order submission with combined previous + new items payload
+- [ ] Integration testing with real order IDs
 
-### Backend Model Fix (March 6, 2026)
-- Added missing fields to `AppConfigUpdate` Pydantic model: `backgroundImageUrl`, `mobileBackgroundImageUrl`, `showHamburgerMenu`, `showLoginButton`, `showEstimatedTimes`
-- These were silently ignored before; now correctly persisted via PUT /api/config/
+### P1 (High)
+- [ ] Call Waiter API integration
+- [ ] Pay Bill flow implementation
+- [ ] OTP-based customer login
 
-## Next Action Items
-- None - all requested changes complete and verified
+### P2 (Medium)
+- [ ] Coupon code validation
+- [ ] Loyalty points redemption
+- [ ] Multiple payment methods
 
-## Backlog/Future (P1/P2)
-- **P1:** Add `.npmrc` with `legacy-peer-deps=true` for easier local npm installs
-- **P1:** Disable visual-edits plugin for local dev (`enableVisualEdits: false` in craco.config.js)
-- **P2:** React Native + Expo migration (8-week plan available on request)
+## Next Tasks
+1. Test full edit order submission flow
+2. Implement order status real-time updates
+3. Add payment integration
+
+## Test Credentials
+- **Admin Email**: demo@restaurant.com
+- **Admin Password**: demo123
+- **Test Order ID**: 243057

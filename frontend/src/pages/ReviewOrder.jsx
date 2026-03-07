@@ -516,14 +516,23 @@ const ReviewOrder = () => {
       // Clear cart after successful order
       clearCart();
 
-      // Prepare items for order success page
-      const orderItems = cartItems.map(item => ({
+      // Prepare new items for order success page
+      const newOrderItems = cartItems.map(item => ({
         name: item.item?.name || 'Item',
         quantity: item.quantity,
         price: item.item?.price || item.totalPrice / item.quantity,
         totalPrice: item.totalPrice,
         veg: item.item?.veg === 1 || item.item?.veg === true
       }));
+
+      // Prepare previous items if in edit mode
+      const prevItems = isEditMode ? previousOrderItems.map(item => ({
+        name: item.item?.name || 'Item',
+        quantity: item.quantity,
+        price: item.unitPrice || item.price || 0,
+        totalPrice: (item.unitPrice || item.price || 0) * item.quantity,
+        veg: item.item?.veg === true || item.item?.veg === 1
+      })) : [];
 
       // Navigate to success page with order data
       navigate(`/${restaurantId}/order-success`, {
@@ -532,7 +541,8 @@ const ReviewOrder = () => {
             orderId: response?.order_id || editingOrderId || null,
             totalToPay: response?.total_amount || totalToPay.toFixed(2),
             isEditedOrder: isEditMode,
-            items: orderItems
+            items: newOrderItems,
+            previousItems: prevItems
           }
         }
       });
@@ -595,7 +605,7 @@ const ReviewOrder = () => {
           // Clear cart after successful order
           clearCart();
 
-          // Prepare items for order success page
+          // Prepare new items for order success page
           const retryOrderItems = cartItems.map(item => ({
             name: item.item?.name || 'Item',
             quantity: item.quantity,
@@ -604,6 +614,15 @@ const ReviewOrder = () => {
             veg: item.item?.veg === 1 || item.item?.veg === true
           }));
 
+          // Prepare previous items if in edit mode
+          const retryPrevItems = isEditMode ? previousOrderItems.map(item => ({
+            name: item.item?.name || 'Item',
+            quantity: item.quantity,
+            price: item.unitPrice || item.price || 0,
+            totalPrice: (item.unitPrice || item.price || 0) * item.quantity,
+            veg: item.item?.veg === true || item.item?.veg === 1
+          })) : [];
+
           // Navigate to success page
           navigate(`/${restaurantId}/order-success`, {
             state: {
@@ -611,7 +630,8 @@ const ReviewOrder = () => {
                 orderId: retryResponse?.order_id || editingOrderId || null,
                 totalToPay: retryResponse?.total_amount || totalToPay.toFixed(2),
                 isEditedOrder: isEditMode,
-                items: retryOrderItems
+                items: retryOrderItems,
+                previousItems: retryPrevItems
               }
             }
           });

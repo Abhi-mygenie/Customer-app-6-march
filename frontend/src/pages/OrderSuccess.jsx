@@ -43,7 +43,13 @@ const OrderSuccess = () => {
   const [showItems, setShowItems] = useState(true);
 
   const orderData = location.state?.orderData || null;
-  const orderItems = orderData?.items || [];
+  const newItems = orderData?.items || [];
+  const previousItems = orderData?.previousItems || [];
+  const isEditedOrder = orderData?.isEditedOrder || false;
+  
+  // Combine all items for total count
+  const allItems = [...previousItems, ...newItems];
+  const totalItemsCount = allItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   // Fetch admin config for this restaurant
   useEffect(() => {
@@ -136,9 +142,6 @@ const OrderSuccess = () => {
   const showGoToMenu = isConfigEnabled(restaurant, 'show_go_to_menu');
   const showTableNumber = isConfigEnabled(restaurant, 'show_table_number') && isScanned && scannedTableNo;
 
-  // Calculate total items count
-  const totalItemsCount = orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
   return (
     <div className="order-success-page" data-testid="order-success-page">
       <Header
@@ -188,7 +191,7 @@ const OrderSuccess = () => {
         </div>
 
         {/* Items Ordered - Collapsible */}
-        {orderItems.length > 0 && (
+        {allItems.length > 0 && (
           <div className="order-success-items-card">
             <div 
               className="order-success-items-header"
@@ -204,20 +207,53 @@ const OrderSuccess = () => {
             </div>
             {showItems && (
               <div className="order-success-items-list">
-                {orderItems.map((item, index) => (
-                  <div key={index} className="order-success-item-row">
-                    <div className="order-success-item-info">
-                      <span className={`order-success-item-veg ${item.veg ? 'veg' : 'non-veg'}`}>
-                        <span className="veg-dot"></span>
-                      </span>
-                      <span className="order-success-item-name">{item.name || item.item?.name || 'Item'}</span>
-                      <span className="order-success-item-qty">x{item.quantity || 1}</span>
+                {/* Previous Items Section */}
+                {isEditedOrder && previousItems.length > 0 && (
+                  <>
+                    <div className="order-success-items-section-label">
+                      Previous Order
                     </div>
-                    <span className="order-success-item-price">
-                      ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
-                    </span>
-                  </div>
-                ))}
+                    {previousItems.map((item, index) => (
+                      <div key={`prev-${index}`} className="order-success-item-row order-success-item-previous">
+                        <div className="order-success-item-info">
+                          <span className={`order-success-item-veg ${item.veg ? 'veg' : 'non-veg'}`}>
+                            <span className="veg-dot"></span>
+                          </span>
+                          <span className="order-success-item-name">{item.name || 'Item'}</span>
+                          <span className="order-success-item-qty">x{item.quantity || 1}</span>
+                        </div>
+                        <span className="order-success-item-price">
+                          ₹{((item.price || 0) * (item.quantity || 1)).toFixed(0)}
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                {/* New Items Section */}
+                {newItems.length > 0 && (
+                  <>
+                    {isEditedOrder && previousItems.length > 0 && (
+                      <div className="order-success-items-section-label order-success-items-section-new">
+                        Newly Added
+                      </div>
+                    )}
+                    {newItems.map((item, index) => (
+                      <div key={`new-${index}`} className="order-success-item-row">
+                        <div className="order-success-item-info">
+                          <span className={`order-success-item-veg ${item.veg ? 'veg' : 'non-veg'}`}>
+                            <span className="veg-dot"></span>
+                          </span>
+                          <span className="order-success-item-name">{item.name || 'Item'}</span>
+                          <span className="order-success-item-qty">x{item.quantity || 1}</span>
+                        </div>
+                        <span className="order-success-item-price">
+                          ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>

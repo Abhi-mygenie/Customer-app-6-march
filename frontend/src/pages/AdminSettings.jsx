@@ -13,7 +13,8 @@ import {
   IoCreateOutline,
   IoCloseOutline,
   IoDocumentOutline,
-  IoEyeOutline
+  IoEyeOutline,
+  IoRestaurantOutline
 } from 'react-icons/io5';
 import toast from 'react-hot-toast';
 import ContentTab from '../components/AdminSettings/ContentTab';
@@ -435,6 +436,7 @@ const AdminSettings = () => {
     { id: 'banners', label: 'Banners', icon: IoImagesOutline },
     { id: 'content', label: 'Content', icon: IoDocumentOutline },
     { id: 'visibility', label: 'Visibility', icon: IoEyeOutline },
+    { id: 'menu', label: 'Menu', icon: IoRestaurantOutline, navigateTo: 'menu' },
   ];
 
   if (!user || !isRestaurant) {
@@ -468,11 +470,18 @@ const AdminSettings = () => {
 
       {/* Section Navigation Tabs */}
       <div className="section-tabs" data-testid="section-tabs">
-        {sections.map(({ id, label, icon: Icon }) => (
+        {sections.map(({ id, label, icon: Icon, navigateTo }) => (
           <button
             key={id}
             className={`section-tab ${activeSection === id ? 'active' : ''}`}
-            onClick={() => setActiveSection(id)}
+            onClick={() => {
+              if (navigateTo) {
+                const restaurantId = user.restaurant_id || user.id;
+                navigate(`/${restaurantId}/${navigateTo}`);
+              } else {
+                setActiveSection(id);
+              }
+            }}
             data-testid={`tab-${id}`}
           >
             <Icon className="tab-icon" />

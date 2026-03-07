@@ -15,6 +15,31 @@ import { FaDoorOpen } from 'react-icons/fa';
 import './OrderSuccess.css';
 
 /**
+ * Maps f_order_status numeric value to status string
+ * 1 → Preparing, 2 → Ready, 5 → Served
+ */
+const mapFoodOrderStatus = (item) => {
+  // Check for f_order_status (numeric) first
+  const fStatus = item?.f_order_status;
+  if (fStatus !== undefined && fStatus !== null) {
+    const statusMap = {
+      1: 'preparing',
+      2: 'ready',
+      5: 'served'
+    };
+    return statusMap[fStatus] || 'preparing';
+  }
+  
+  // Fallback to food_status or status (string)
+  const stringStatus = item?.food_status || item?.status;
+  if (stringStatus) {
+    return stringStatus.toLowerCase();
+  }
+  
+  return 'preparing';
+};
+
+/**
  * Item Status Badge Component
  * Status: 'preparing' | 'ready' | 'served'
  */
@@ -259,7 +284,7 @@ const OrderSuccess = () => {
                           <span className="order-success-item-price">
                             ₹{((item.price || 0) * (item.quantity || 1)).toFixed(0)}
                           </span>
-                          {showFoodStatus && <ItemStatusBadge status={item.status || 'preparing'} />}
+                          {showFoodStatus && <ItemStatusBadge status={mapFoodOrderStatus(item)} />}
                         </div>
                       </div>
                     ))}
@@ -287,7 +312,7 @@ const OrderSuccess = () => {
                           <span className="order-success-item-price">
                             ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
                           </span>
-                          {showFoodStatus && <ItemStatusBadge status={item.status || 'preparing'} />}
+                          {showFoodStatus && <ItemStatusBadge status={mapFoodOrderStatus(item)} />}
                         </div>
                       </div>
                     ))}

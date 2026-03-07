@@ -69,7 +69,7 @@ const OrderSuccess = () => {
   const location = useLocation();
   const { restaurantId } = useRestaurantId();
   const { restaurant } = useRestaurantDetails(restaurantId);
-  const { logoUrl: configLogoUrl, phone: configPhone, fetchConfig } = useRestaurantConfig();
+  const { logoUrl: configLogoUrl, phone: configPhone, fetchConfig, showFoodStatus } = useRestaurantConfig();
   const { tableNo: scannedTableNo, roomOrTable: scannedRoomOrTable, isScanned } = useScannedTable();
   const { startEditOrder } = useCart();
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
@@ -259,7 +259,7 @@ const OrderSuccess = () => {
                           <span className="order-success-item-price">
                             ₹{((item.price || 0) * (item.quantity || 1)).toFixed(0)}
                           </span>
-                          <ItemStatusBadge status={item.status || 'preparing'} />
+                          {showFoodStatus && <ItemStatusBadge status={item.status || 'preparing'} />}
                         </div>
                       </div>
                     ))}
@@ -287,7 +287,7 @@ const OrderSuccess = () => {
                           <span className="order-success-item-price">
                             ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
                           </span>
-                          <ItemStatusBadge status={item.status || 'preparing'} />
+                          {showFoodStatus && <ItemStatusBadge status={item.status || 'preparing'} />}
                         </div>
                       </div>
                     ))}

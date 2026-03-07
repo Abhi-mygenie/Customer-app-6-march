@@ -32,6 +32,8 @@ const DEFAULT_CONFIG = {
   showSpecialInstructions: true,
   showPriceBreakdown: true,
   showTableInfo: true,
+  // Order Status Page
+  showFoodStatus: true,  // Show food item status (Preparing/Ready/Served)
   // Branding - Colors
   logoUrl: null,
   backgroundImageUrl: null,          // Desktop landing page background image
@@ -255,6 +257,8 @@ export const RestaurantConfigProvider = ({ children }) => {
     showSpecialInstructions: isOn('showSpecialInstructions'),
     showPriceBreakdown: isOn('showPriceBreakdown'),
     showTableInfo: isOn('showTableInfo'),
+    // Order Status Page
+    showFoodStatus: isOn('showFoodStatus'),
     // Branding - Colors
     logoUrl: config.logoUrl,
     backgroundImageUrl: config.backgroundImageUrl,

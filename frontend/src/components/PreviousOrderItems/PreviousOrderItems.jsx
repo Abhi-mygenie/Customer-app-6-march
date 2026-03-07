@@ -1,5 +1,6 @@
 import React from 'react';
 import { IoLockClosedOutline, IoTimeOutline, IoCheckmarkOutline, IoCheckmarkDoneOutline } from 'react-icons/io5';
+import { useRestaurantConfig } from '../../context/RestaurantConfigContext';
 import './PreviousOrderItems.css';
 
 /**
@@ -41,6 +42,7 @@ const ItemStatusBadge = ({ status }) => {
  * These items cannot be modified or removed
  */
 const PreviousOrderItems = ({ items, orderId }) => {
+  const { showFoodStatus } = useRestaurantConfig();
   if (!items || items.length === 0) return null;
 
   // Calculate subtotal for previous items
@@ -111,7 +113,7 @@ const PreviousOrderItems = ({ items, orderId }) => {
               <span className="previous-order-item-price">
                 ₹{((parseFloat(item.unitPrice) || parseFloat(item.price) || 0) * item.quantity).toFixed(2)}
               </span>
-              <ItemStatusBadge status={item.status || 'preparing'} />
+              {showFoodStatus && <ItemStatusBadge status={item.status || 'preparing'} />}
             </div>
           </div>
         ))}

@@ -104,6 +104,7 @@ const VisibilityTab = ({ ToggleRow }) => {
             <ToggleRow field="showCallWaiter" label="Call Waiter Button" />
             <ToggleRow field="showPayBill" label="Pay Bill Button" />
             <ToggleRow field="showEstimatedTimes" label="Estimated Times on Order Status" />
+            <ToggleRow field="showFoodStatus" label="Food Item Status (Preparing/Ready/Served)" />
           </div>
         </div>
       )}

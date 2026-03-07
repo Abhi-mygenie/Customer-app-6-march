@@ -8,7 +8,7 @@ import { useCart } from '../context/CartContext';
 import { isMultipleMenu } from '../api/utils/restaurantIdConfig';
 import { getOrderDetails } from '../api/services/orderService';
 import Header from '../components/Header/Header';
-import { IoCheckmarkCircle, IoCallOutline, IoChevronDownOutline, IoChevronUpOutline, IoTimeOutline, IoCheckmarkOutline, IoCheckmarkDoneOutline } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoCallOutline, IoChevronDownOutline, IoChevronUpOutline, IoTimeOutline, IoCheckmarkOutline, IoCheckmarkDoneOutline, IoCloseOutline } from 'react-icons/io5';
 import { RiBillLine } from 'react-icons/ri';
 import { MdOutlineEdit, MdOutlineRestaurantMenu, MdOutlineTableRestaurant } from 'react-icons/md';
 import { FaDoorOpen } from 'react-icons/fa';
@@ -16,7 +16,7 @@ import './OrderSuccess.css';
 
 /**
  * Maps f_order_status numeric value to status string
- * 1 → Preparing, 2 → Ready, 5 → Served
+ * 1 → Preparing, 2 → Ready, 3 → Cancelled, 5 → Served, 6 → Paid, 7 → Yet to be confirmed
  */
 const mapFoodOrderStatus = (item) => {
   // Check for f_order_status (numeric) first
@@ -25,7 +25,10 @@ const mapFoodOrderStatus = (item) => {
     const statusMap = {
       1: 'preparing',
       2: 'ready',
-      5: 'served'
+      3: 'cancelled',
+      5: 'served',
+      6: 'paid',
+      7: 'pending'
     };
     return statusMap[fStatus] || 'preparing';
   }
@@ -41,10 +44,15 @@ const mapFoodOrderStatus = (item) => {
 
 /**
  * Item Status Badge Component
- * Status: 'preparing' | 'ready' | 'served'
+ * Status: 'preparing' | 'ready' | 'served' | 'cancelled' | 'paid' | 'pending'
  */
 const ItemStatusBadge = ({ status }) => {
   const statusConfig = {
+    pending: {
+      label: 'Yet to be confirmed',
+      icon: <IoTimeOutline />,
+      className: 'status-pending'
+    },
     preparing: {
       label: 'Preparing',
       icon: <IoTimeOutline />,
@@ -59,6 +67,16 @@ const ItemStatusBadge = ({ status }) => {
       label: 'Served',
       icon: <IoCheckmarkDoneOutline />,
       className: 'status-served'
+    },
+    cancelled: {
+      label: 'Cancelled',
+      icon: <IoCloseOutline />,
+      className: 'status-cancelled'
+    },
+    paid: {
+      label: 'Paid',
+      icon: <IoCheckmarkDoneOutline />,
+      className: 'status-paid'
     }
   };
 

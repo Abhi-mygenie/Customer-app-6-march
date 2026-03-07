@@ -141,18 +141,19 @@ const OrderSuccess = () => {
     try {
       setIsLoadingStatus(true);
       const orderDetails = await getOrderDetails(orderId);
-      if (orderDetails?.details && orderDetails.details.length > 0) {
-        // Map API response to item format with status from API
-        const updatedItems = orderDetails.details.map(detail => ({
-          id: detail.id,
-          name: detail.food_details?.name || detail.name || 'Item',
-          price: parseFloat(detail.unit_price) || detail.price || 0,
-          quantity: detail.quantity || 1,
-          veg: detail.food_details?.veg === 1 || detail.veg,
-          f_order_status: detail.f_order_status,
-          food_status: detail.food_status,
-          status: detail.status,
+      console.log('[OrderSuccess] API response:', orderDetails);
+      
+      if (orderDetails?.previousItems && orderDetails.previousItems.length > 0) {
+        // Use items directly from API - already has f_order_status
+        const updatedItems = orderDetails.previousItems.map(item => ({
+          id: item.id,
+          name: item.item?.name || 'Item',
+          price: item.unitPrice || item.price || 0,
+          quantity: item.quantity || 1,
+          veg: item.item?.veg === true || item.item?.veg === 1,
+          f_order_status: item.f_order_status,
         }));
+        console.log('[OrderSuccess] Mapped items:', updatedItems);
         setLiveOrderItems(updatedItems);
       }
     } catch (error) {

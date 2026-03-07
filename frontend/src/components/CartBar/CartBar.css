@@ -65,7 +65,7 @@
   background-color: var(--text-white);
   color: var(--color-primary);
   border: 2px solid var(--text-white);
-  border-radius: 20px; /* Match cart bar border radius */
+  border-radius: var(--radius-button, 20px); /* Match cart bar border radius */
   font-family: var(--font-body);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
@@ -121,7 +121,7 @@ body.cart-bar-visible {
   .cart-bar-view-btn {
     padding: var(--spacing-xs) var(--spacing-lg);
     font-size: var(--font-size-sm);
-    border-radius: 20px; /* Match cart bar border radius */
+    border-radius: var(--radius-button, 20px); /* Match cart bar border radius */
     min-height: 35px; /* Smaller on mobile */
   }
 
@@ -151,7 +151,7 @@ body.cart-bar-visible {
   .cart-bar-view-btn {
     padding: var(--spacing-xs) var(--spacing-md);
     font-size: var(--font-size-xs);
-    border-radius: 20px; /* Match cart bar border radius */
+    border-radius: var(--radius-button, 20px); /* Match cart bar border radius */
     min-height: 32px; /* Smaller on very small screens */
   }
 

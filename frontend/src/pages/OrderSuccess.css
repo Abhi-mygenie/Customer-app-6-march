@@ -243,7 +243,7 @@
   font-size: 0.82rem;
   font-weight: 600;
   letter-spacing: 0.3px;
-  border-radius: 50px;
+  border-radius: var(--radius-button, 50px);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;

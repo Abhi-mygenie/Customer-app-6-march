@@ -415,21 +415,23 @@ const OrderSuccess = () => {
           </div>
         )}
 
-        {/* Action Buttons - Compact */}
+        {/* Action Buttons - Landing Page Style */}
         <div className="order-success-actions-compact" data-testid="order-success-actions">
-          {/* Top row: Edit + Call Waiter + Pay Bill */}
+          {/* Top: Edit Order - Primary full width */}
+          {showEditOrder && (
+            <button
+              className="order-success-btn order-success-btn-primary"
+              onClick={handleEditOrder}
+              disabled={isLoadingEdit}
+              data-testid="order-success-edit-btn"
+            >
+              <MdOutlineEdit />
+              {isLoadingEdit ? 'Loading...' : 'EDIT ORDER'}
+            </button>
+          )}
+
+          {/* Bottom row: Call Waiter + Pay Bill */}
           <div className="order-success-btn-row">
-            {showEditOrder && (
-              <button
-                className="order-success-btn order-success-btn-outline"
-                onClick={handleEditOrder}
-                disabled={isLoadingEdit}
-                data-testid="order-success-edit-btn"
-              >
-                <MdOutlineEdit />
-                {isLoadingEdit ? '...' : 'Edit'}
-              </button>
-            )}
             {showCallWaiter && (
               <button
                 className="order-success-btn order-success-btn-outline"
@@ -437,7 +439,7 @@ const OrderSuccess = () => {
                 data-testid="order-success-call-waiter-btn"
               >
                 <IoCallOutline />
-                Call
+                <span>CALL WAITER</span>
               </button>
             )}
             {showPayBill && (
@@ -447,12 +449,10 @@ const OrderSuccess = () => {
                 data-testid="order-success-pay-bill-btn"
               >
                 <RiBillLine />
-                Pay
+                <span>PAY BILL</span>
               </button>
             )}
           </div>
-
-{/* Browse Menu removed - Edit button serves this purpose */}
         </div>
 
       </div>

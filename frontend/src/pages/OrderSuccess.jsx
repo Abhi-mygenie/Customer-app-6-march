@@ -17,14 +17,10 @@ import './OrderSuccess.css';
 /**
  * Maps f_order_status numeric value to status string
  * 1 → Preparing, 2 → Ready, 3 → Cancelled, 5 → Served, 6 → Paid, 7 → Yet to be confirmed
+ * Status always comes from API - no defaults needed
  */
-const mapFoodOrderStatus = (item, isNewItem = false) => {
-  // For newly added items (not yet confirmed by kitchen), default to pending
-  if (isNewItem && !item?.f_order_status && !item?.food_status && !item?.status) {
-    return 'pending';
-  }
-
-  // Check for f_order_status (numeric) first
+const mapFoodOrderStatus = (item) => {
+  // Check for f_order_status (numeric) from API
   const fStatus = item?.f_order_status;
   if (fStatus !== undefined && fStatus !== null) {
     const statusMap = {
@@ -38,13 +34,12 @@ const mapFoodOrderStatus = (item, isNewItem = false) => {
     return statusMap[fStatus] || 'pending';
   }
   
-  // Fallback to food_status or status (string)
+  // Fallback to food_status or status (string) from API
   const stringStatus = item?.food_status || item?.status;
   if (stringStatus) {
     return stringStatus.toLowerCase();
   }
   
-  // Default to pending (yet to be confirmed) instead of preparing
   return 'pending';
 };
 
@@ -124,15 +119,15 @@ const OrderSuccess = () => {
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
   const [showItems, setShowItems] = useState(true);
   const [liveOrderItems, setLiveOrderItems] = useState([]);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
   const orderData = location.state?.orderData || null;
   const orderId = orderData?.orderId;
-  const initialNewItems = orderData?.items || [];
   const initialPreviousItems = orderData?.previousItems || [];
   const isEditedOrder = orderData?.isEditedOrder || false;
   
-  // Use live items if available, otherwise fall back to initial data
-  const newItems = liveOrderItems.length > 0 ? liveOrderItems : initialNewItems;
+  // Use live items from API only (status comes from API)
+  const newItems = liveOrderItems;
   const previousItems = initialPreviousItems;
   
   // Combine all items for total count
@@ -144,9 +139,10 @@ const OrderSuccess = () => {
     if (!orderId) return;
     
     try {
+      setIsLoadingStatus(true);
       const orderDetails = await getOrderDetails(orderId);
       if (orderDetails?.details && orderDetails.details.length > 0) {
-        // Map API response to item format with updated status
+        // Map API response to item format with status from API
         const updatedItems = orderDetails.details.map(detail => ({
           id: detail.id,
           name: detail.food_details?.name || detail.name || 'Item',
@@ -161,6 +157,8 @@ const OrderSuccess = () => {
       }
     } catch (error) {
       console.error('Failed to fetch order status:', error);
+    } finally {
+      setIsLoadingStatus(false);
     }
   };
 
@@ -383,7 +381,7 @@ const OrderSuccess = () => {
                           <span className="order-success-item-price">
                             ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
                           </span>
-                          <ItemStatusBadge status={mapFoodOrderStatus(item, true)} />
+                          <ItemStatusBadge status={mapFoodOrderStatus(item)} />
                         </div>
                       </div>
                     ))}

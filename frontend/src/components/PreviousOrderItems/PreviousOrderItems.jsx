@@ -5,10 +5,15 @@ import './PreviousOrderItems.css';
 
 /**
  * Item Status Badge Component
- * Status: 'preparing' | 'ready' | 'served'
+ * Status: 'pending' | 'preparing' | 'ready' | 'served' | 'cancelled' | 'paid'
  */
 const ItemStatusBadge = ({ status }) => {
   const statusConfig = {
+    pending: {
+      label: 'Yet to be confirmed',
+      icon: <IoTimeOutline />,
+      className: 'status-pending'
+    },
     preparing: {
       label: 'Preparing',
       icon: <IoTimeOutline />,
@@ -23,10 +28,20 @@ const ItemStatusBadge = ({ status }) => {
       label: 'Served',
       icon: <IoCheckmarkDoneOutline />,
       className: 'status-served'
+    },
+    cancelled: {
+      label: 'Cancelled',
+      icon: <IoTimeOutline />,
+      className: 'status-cancelled'
+    },
+    paid: {
+      label: 'Paid',
+      icon: <IoCheckmarkDoneOutline />,
+      className: 'status-paid'
     }
   };
 
-  const config = statusConfig[status] || statusConfig.preparing;
+  const config = statusConfig[status] || statusConfig.pending;
 
   return (
     <span className={`item-status-badge ${config.className}`} data-testid={`status-${status}`}>
@@ -34,6 +49,25 @@ const ItemStatusBadge = ({ status }) => {
       <span className="item-status-label">{config.label}</span>
     </span>
   );
+};
+
+/**
+ * Maps f_order_status numeric value to status string
+ */
+const mapFoodOrderStatus = (item) => {
+  const fStatus = item?.f_order_status;
+  if (fStatus !== undefined && fStatus !== null) {
+    const statusMap = {
+      1: 'preparing',
+      2: 'ready',
+      3: 'cancelled',
+      5: 'served',
+      6: 'paid',
+      7: 'pending'
+    };
+    return statusMap[fStatus] || 'pending';
+  }
+  return item?.foodStatus || 'pending';
 };
 
 /**
@@ -74,45 +108,16 @@ const PreviousOrderItems = ({ items, orderId }) => {
             className="previous-order-item"
             data-testid={`previous-order-item-${item.id || index}`}
           >
-            {/* Item Info */}
-            <div className="previous-order-item-info">
-              {/* Veg/Non-Veg Indicator */}
-              <span className={`previous-order-veg-label ${item.item?.veg ? 'veg' : 'non-veg'}`}>
-                <span className="previous-order-veg-dot"></span>
-              </span>
-              
-              <div className="previous-order-item-details">
-                <span className="previous-order-item-name">{item.item?.name || 'Unknown Item'}</span>
-                
-                {/* Show variations if any */}
-                {item.variations && item.variations.length > 0 && (
-                  <span className="previous-order-item-variations">
-                    {item.variations.map((v, i) => v.name || v.label).join(', ')}
-                  </span>
-                )}
-                
-                {/* Show add-ons if any */}
-                {item.add_ons && item.add_ons.length > 0 && (
-                  <span className="previous-order-item-addons">
-                    + {item.add_ons.map(a => a.name).join(', ')}
-                  </span>
-                )}
-
-                {/* Show cooking notes if any */}
-                {item.foodLevelNotes && (
-                  <span className="previous-order-item-notes">
-                    Note: {item.foodLevelNotes}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Quantity and Price */}
+            {/* Item name */}
+            <span className="previous-order-item-name">{item.item?.name || 'Unknown Item'}</span>
+            
+            {/* Quantity, Price and Status - all inline */}
             <div className="previous-order-item-right">
               <span className="previous-order-item-quantity">x{item.quantity}</span>
               <span className="previous-order-item-price">
-                ₹{((parseFloat(item.unitPrice) || parseFloat(item.price) || 0) * item.quantity).toFixed(2)}
+                ₹{((parseFloat(item.unitPrice) || parseFloat(item.price) || 0) * item.quantity).toFixed(0)}
               </span>
+              {showFoodStatus && <ItemStatusBadge status={mapFoodOrderStatus(item)} />}
             </div>
           </div>
         ))}

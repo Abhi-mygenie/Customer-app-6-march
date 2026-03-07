@@ -60,61 +60,13 @@
 .previous-order-item {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   padding: 10px 12px;
   background-color: var(--bg-primary, #fff);
   border-radius: var(--radius-container-sm, 6px);
   border: 1px dashed var(--border-light, #ddd);
   opacity: 0.85;
-}
-
-.previous-order-item-info {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  flex: 1;
-}
-
-/* Veg/Non-Veg Indicator */
-.previous-order-veg-label {
-  width: 16px;
-  height: 16px;
-  border: 2px solid;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  padding: 2px;
-  margin-top: 2px;
-}
-
-.previous-order-veg-label.veg {
-  border-color: var(--color-veg, #0f8a0f);
-}
-
-.previous-order-veg-label.non-veg {
-  border-color: var(--color-non-veg, #b91c1c);
-}
-
-.previous-order-veg-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: currentColor;
-}
-
-.previous-order-veg-label.veg .previous-order-veg-dot {
-  color: var(--color-veg, #0f8a0f);
-}
-
-.previous-order-veg-label.non-veg .previous-order-veg-dot {
-  color: var(--color-non-veg, #b91c1c);
-}
-
-.previous-order-item-details {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  gap: 12px;
 }
 
 .previous-order-item-name {
@@ -122,27 +74,15 @@
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-primary, #333);
+  flex: 1;
 }
 
-.previous-order-item-variations,
-.previous-order-item-addons,
-.previous-order-item-notes {
-  font-family: var(--font-body, 'Montserrat', sans-serif);
-  font-size: 0.75rem;
-  color: var(--text-tertiary, #888);
-}
-
-.previous-order-item-notes {
-  font-style: italic;
-}
-
-/* Right side - Quantity, Price, Status */
+/* Right side - Quantity, Price, Status - all inline */
 .previous-order-item-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  min-width: 80px;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .previous-order-item-quantity {
@@ -186,6 +126,13 @@
   line-height: 1;
 }
 
+/* Pending - Orange/Amber (Yet to be confirmed) */
+.status-pending {
+  background: #FEF3C7;
+  color: #D97706;
+  border-color: #F59E0B;
+}
+
 /* Preparing - Orange/Amber */
 .status-preparing {
   background: #FEF3C7;
@@ -193,7 +140,8 @@
   border-color: #F59E0B;
 }
 
-.status-preparing svg {
+.status-preparing svg,
+.status-pending svg {
   animation: statusPulse 1.5s ease-in-out infinite;
 }
 
@@ -214,6 +162,20 @@
   background: #F3F4F6;
   color: #6B7280;
   border-color: #9CA3AF;
+}
+
+/* Cancelled - Red */
+.status-cancelled {
+  background: #FEE2E2;
+  color: #DC2626;
+  border-color: #EF4444;
+}
+
+/* Paid - Blue */
+.status-paid {
+  background: #DBEAFE;
+  color: #2563EB;
+  border-color: #3B82F6;
 }
 
 /* Subtotal */

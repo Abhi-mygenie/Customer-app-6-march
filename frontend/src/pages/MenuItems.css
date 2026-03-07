@@ -297,7 +297,7 @@
   background-color: var(--color-primary);
   color: var(--text-white);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-button, 10px);
   padding: 12px 15px;
   font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
@@ -745,7 +745,7 @@ body.cart-bar-visible .menu-fab {
   width: 140px;
   height: 140px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-container-lg, 12px);
   overflow: visible;
   background-color: var(--bg-secondary);
   border: 2px solid var(--border-primary);
@@ -756,7 +756,7 @@ body.cart-bar-visible .menu-fab {
   height: 100%;
   object-fit: contain;
   display: block;
-  border-radius: 12px;
+  border-radius: var(--radius-container-lg, 12px);
 }
 
 .item-image-placeholder {
@@ -766,7 +766,7 @@ body.cart-bar-visible .menu-fab {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--color-gray-400) 100%);
-  border-radius: 12px;
+  border-radius: var(--radius-container-lg, 12px);
 }
 
 .default-food-icon {

@@ -99,15 +99,62 @@ const OrderSuccess = () => {
   const { startEditOrder } = useCart();
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
   const [showItems, setShowItems] = useState(true);
+  const [liveOrderItems, setLiveOrderItems] = useState([]);
 
   const orderData = location.state?.orderData || null;
-  const newItems = orderData?.items || [];
-  const previousItems = orderData?.previousItems || [];
+  const orderId = orderData?.orderId;
+  const initialNewItems = orderData?.items || [];
+  const initialPreviousItems = orderData?.previousItems || [];
   const isEditedOrder = orderData?.isEditedOrder || false;
+  
+  // Use live items if available, otherwise fall back to initial data
+  const newItems = liveOrderItems.length > 0 ? liveOrderItems : initialNewItems;
+  const previousItems = initialPreviousItems;
   
   // Combine all items for total count
   const allItems = [...previousItems, ...newItems];
   const totalItemsCount = allItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
+
+  // Fetch order details and update item statuses
+  const fetchOrderStatus = async () => {
+    if (!orderId) return;
+    
+    try {
+      const orderDetails = await getOrderDetails(orderId);
+      if (orderDetails?.details && orderDetails.details.length > 0) {
+        // Map API response to item format with updated status
+        const updatedItems = orderDetails.details.map(detail => ({
+          id: detail.id,
+          name: detail.food_details?.name || detail.name || 'Item',
+          price: parseFloat(detail.unit_price) || detail.price || 0,
+          quantity: detail.quantity || 1,
+          veg: detail.food_details?.veg === 1 || detail.veg,
+          f_order_status: detail.f_order_status,
+          food_status: detail.food_status,
+          status: detail.status,
+        }));
+        setLiveOrderItems(updatedItems);
+      }
+    } catch (error) {
+      console.error('Failed to fetch order status:', error);
+    }
+  };
+
+  // Fetch order status on mount and poll every 1 minute
+  useEffect(() => {
+    if (!orderId) return;
+
+    // Initial fetch
+    fetchOrderStatus();
+
+    // Set up polling every 60 seconds
+    const pollInterval = setInterval(() => {
+      fetchOrderStatus();
+    }, 60000);
+
+    // Cleanup on unmount
+    return () => clearInterval(pollInterval);
+  }, [orderId]);
 
   // Fetch admin config for this restaurant
   useEffect(() => {

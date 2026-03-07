@@ -452,17 +452,7 @@ const OrderSuccess = () => {
             )}
           </div>
 
-          {/* Browse Menu - Full width */}
-          {showGoToMenu && (
-            <button
-              className="order-success-btn order-success-btn-primary"
-              onClick={handleGoToMenu}
-              data-testid="order-success-menu-btn"
-            >
-              <MdOutlineRestaurantMenu />
-              Browse Menu
-            </button>
-          )}
+{/* Browse Menu removed - Edit button serves this purpose */}
         </div>
 
       </div>

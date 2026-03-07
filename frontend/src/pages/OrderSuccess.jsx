@@ -8,11 +8,44 @@ import { useCart } from '../context/CartContext';
 import { isMultipleMenu } from '../api/utils/restaurantIdConfig';
 import { getOrderDetails } from '../api/services/orderService';
 import Header from '../components/Header/Header';
-import { IoCheckmarkCircle, IoCallOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoCallOutline, IoChevronDownOutline, IoChevronUpOutline, IoTimeOutline, IoCheckmarkOutline, IoCheckmarkDoneOutline } from 'react-icons/io5';
 import { RiBillLine } from 'react-icons/ri';
 import { MdOutlineEdit, MdOutlineRestaurantMenu, MdOutlineTableRestaurant } from 'react-icons/md';
 import { FaDoorOpen } from 'react-icons/fa';
 import './OrderSuccess.css';
+
+/**
+ * Item Status Badge Component
+ * Status: 'preparing' | 'ready' | 'served'
+ */
+const ItemStatusBadge = ({ status }) => {
+  const statusConfig = {
+    preparing: {
+      label: 'Preparing',
+      icon: <IoTimeOutline />,
+      className: 'status-preparing'
+    },
+    ready: {
+      label: 'Ready',
+      icon: <IoCheckmarkOutline />,
+      className: 'status-ready'
+    },
+    served: {
+      label: 'Served',
+      icon: <IoCheckmarkDoneOutline />,
+      className: 'status-served'
+    }
+  };
+
+  const config = statusConfig[status] || statusConfig.preparing;
+
+  return (
+    <span className={`item-status-badge ${config.className}`} data-testid={`status-${status}`}>
+      {config.icon}
+      <span className="item-status-label">{config.label}</span>
+    </span>
+  );
+};
 
 // Helper: check if a success_config flag is enabled (defaults to Y)
 const isConfigEnabled = (restaurant, key) => {
@@ -222,9 +255,12 @@ const OrderSuccess = () => {
                           <span className="order-success-item-name">{item.name || 'Item'}</span>
                           <span className="order-success-item-qty">x{item.quantity || 1}</span>
                         </div>
-                        <span className="order-success-item-price">
-                          ₹{((item.price || 0) * (item.quantity || 1)).toFixed(0)}
-                        </span>
+                        <div className="order-success-item-right">
+                          <span className="order-success-item-price">
+                            ₹{((item.price || 0) * (item.quantity || 1)).toFixed(0)}
+                          </span>
+                          <ItemStatusBadge status={item.status || 'preparing'} />
+                        </div>
                       </div>
                     ))}
                   </>
@@ -247,9 +283,12 @@ const OrderSuccess = () => {
                           <span className="order-success-item-name">{item.name || 'Item'}</span>
                           <span className="order-success-item-qty">x{item.quantity || 1}</span>
                         </div>
-                        <span className="order-success-item-price">
-                          ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
-                        </span>
+                        <div className="order-success-item-right">
+                          <span className="order-success-item-price">
+                            ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
+                          </span>
+                          <ItemStatusBadge status={item.status || 'preparing'} />
+                        </div>
                       </div>
                     ))}
                   </>

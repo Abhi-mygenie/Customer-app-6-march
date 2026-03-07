@@ -1,6 +1,39 @@
 import React from 'react';
-import { IoLockClosedOutline } from 'react-icons/io5';
+import { IoLockClosedOutline, IoTimeOutline, IoCheckmarkOutline, IoCheckmarkDoneOutline } from 'react-icons/io5';
 import './PreviousOrderItems.css';
+
+/**
+ * Item Status Badge Component
+ * Status: 'preparing' | 'ready' | 'served'
+ */
+const ItemStatusBadge = ({ status }) => {
+  const statusConfig = {
+    preparing: {
+      label: 'Preparing',
+      icon: <IoTimeOutline />,
+      className: 'status-preparing'
+    },
+    ready: {
+      label: 'Ready',
+      icon: <IoCheckmarkOutline />,
+      className: 'status-ready'
+    },
+    served: {
+      label: 'Served',
+      icon: <IoCheckmarkDoneOutline />,
+      className: 'status-served'
+    }
+  };
+
+  const config = statusConfig[status] || statusConfig.preparing;
+
+  return (
+    <span className={`item-status-badge ${config.className}`} data-testid={`status-${status}`}>
+      {config.icon}
+      <span className="item-status-label">{config.label}</span>
+    </span>
+  );
+};
 
 /**
  * PreviousOrderItems Component
@@ -72,12 +105,13 @@ const PreviousOrderItems = ({ items, orderId }) => {
               </div>
             </div>
 
-            {/* Quantity and Price */}
+            {/* Quantity, Price and Status */}
             <div className="previous-order-item-right">
               <span className="previous-order-item-quantity">x{item.quantity}</span>
               <span className="previous-order-item-price">
                 ₹{((parseFloat(item.unitPrice) || parseFloat(item.price) || 0) * item.quantity).toFixed(2)}
               </span>
+              <ItemStatusBadge status={item.status || 'preparing'} />
             </div>
           </div>
         ))}

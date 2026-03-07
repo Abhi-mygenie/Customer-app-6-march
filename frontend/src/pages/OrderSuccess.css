@@ -206,7 +206,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  padding: 8px 0;
   border-bottom: 1px dashed var(--border-light, #eee);
 }
 
@@ -216,11 +216,73 @@
 
 /* Previous items styling - slightly faded */
 .order-success-item-previous {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .order-success-item-previous .order-success-item-name {
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+}
+
+/* Right side container for price + status */
+.order-success-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Item Status Badges ───────────────────── */
+
+.item-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-family: var(--font-body, 'Montserrat', sans-serif);
+  font-size: 0.6rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid;
+}
+
+.item-status-badge svg {
+  width: 10px;
+  height: 10px;
+}
+
+.item-status-label {
+  line-height: 1;
+}
+
+/* Preparing - Orange/Amber */
+.status-preparing {
+  background: #FEF3C7;
+  color: #D97706;
+  border-color: #F59E0B;
+}
+
+.status-preparing svg {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Ready - Green */
+.status-ready {
+  background: #D1FAE5;
+  color: #059669;
+  border-color: #10B981;
+}
+
+/* Served - Gray */
+.status-served {
+  background: #F3F4F6;
+  color: #6B7280;
+  border-color: #9CA3AF;
 }
 
 .order-success-item-info {

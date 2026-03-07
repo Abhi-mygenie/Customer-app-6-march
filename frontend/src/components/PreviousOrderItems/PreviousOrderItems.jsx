@@ -107,13 +107,12 @@ const PreviousOrderItems = ({ items, orderId }) => {
               </div>
             </div>
 
-            {/* Quantity, Price and Status */}
+            {/* Quantity and Price */}
             <div className="previous-order-item-right">
               <span className="previous-order-item-quantity">x{item.quantity}</span>
               <span className="previous-order-item-price">
                 ₹{((parseFloat(item.unitPrice) || parseFloat(item.price) || 0) * item.quantity).toFixed(2)}
               </span>
-              {showFoodStatus && <ItemStatusBadge status={item.status || 'preparing'} />}
             </div>
           </div>
         ))}

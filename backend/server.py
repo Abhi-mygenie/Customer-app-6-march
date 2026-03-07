@@ -501,26 +501,29 @@ async def get_customer_orders(
 # Air BnB router for order details (Edit Order feature)
 air_bnb_router = APIRouter(prefix="/air-bnb", tags=["Air BnB"])
 
+# MyGenie API base URL
+MYGENIE_API_URL = "https://preprod.mygenie.online/api/v1"
+
 @air_bnb_router.get("/get-order-details/{order_id}")
 async def get_order_details(order_id: str):
-    """Get order details for edit order feature"""
+    """Get order details from MyGenie API"""
+    import httpx
     
-    # Check if order exists in database
-    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
-    
-    if not order:
-        raise HTTPException(status_code=404, detail=f"Order {order_id} not found")
-    
-    # Transform order data to expected format
-    return {
-        "id": order["id"],
-        "order_id": order["id"],
-        "table_id": order.get("table_id", ""),
-        "table_no": order.get("table_no", ""),
-        "restaurant": order.get("restaurant", {}),
-        "delivery_charge": order.get("delivery_charge", "0"),
-        "details": order.get("details", [])
-    }
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(
+                f"{MYGENIE_API_URL}/air-bnb/get-order-details/{order_id}",
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                raise HTTPException(status_code=404, detail=f"Order {order_id} not found")
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to fetch order details from MyGenie")
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=503, detail=f"MyGenie API unavailable: {str(e)}")
 
 @customer_router.get("/points", response_model=List[PointsTransaction])
 async def get_customer_points(

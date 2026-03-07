@@ -965,6 +965,45 @@ async def get_status_checks():
     return status_checks
 
 # ============================================
+# Loyalty Settings Endpoint
+# ============================================
+
+@api_router.get("/loyalty-settings/{restaurant_id}")
+async def get_loyalty_settings(restaurant_id: str):
+    """Get loyalty settings for a restaurant to calculate points"""
+    user_id = f"pos_0001_restaurant_{restaurant_id}"
+    settings = await db.loyalty_settings.find_one(
+        {"user_id": user_id},
+        {"_id": 0}
+    )
+    
+    if not settings:
+        # Return default settings if not found
+        return {
+            "found": False,
+            "bronze_earn_percent": 5.0,
+            "silver_earn_percent": 7.0,
+            "gold_earn_percent": 10.0,
+            "platinum_earn_percent": 15.0,
+            "redemption_value": 0.25,
+            "min_order_value": 100.0,
+            "first_visit_bonus_enabled": True,
+            "first_visit_bonus_points": 50
+        }
+    
+    return {
+        "found": True,
+        "bronze_earn_percent": settings.get("bronze_earn_percent", 5.0),
+        "silver_earn_percent": settings.get("silver_earn_percent", 7.0),
+        "gold_earn_percent": settings.get("gold_earn_percent", 10.0),
+        "platinum_earn_percent": settings.get("platinum_earn_percent", 15.0),
+        "redemption_value": settings.get("redemption_value", 0.25),
+        "min_order_value": settings.get("min_order_value", 100.0),
+        "first_visit_bonus_enabled": settings.get("first_visit_bonus_enabled", True),
+        "first_visit_bonus_points": settings.get("first_visit_bonus_points", 50)
+    }
+
+# ============================================
 # Include all routers
 # ============================================
 

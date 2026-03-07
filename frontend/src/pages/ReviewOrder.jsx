@@ -104,6 +104,23 @@ const ReviewOrder = () => {
     }
   }, [numericRestaurantId, fetchConfig]);
 
+  // Fetch loyalty settings for points calculation
+  useEffect(() => {
+    const fetchLoyaltySettings = async () => {
+      if (!numericRestaurantId) return;
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/loyalty-settings/${numericRestaurantId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setLoyaltySettings(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch loyalty settings:', error);
+      }
+    };
+    fetchLoyaltySettings();
+  }, [numericRestaurantId]);
+
   // Fetch table/room configuration (uses numeric ID)
   const { rooms, tables, loading: tablesLoading, error: tablesError, errorMessage: tablesErrorMessage } = useTableConfig(numericRestaurantId);
 
@@ -134,6 +151,9 @@ const ReviewOrder = () => {
   const [couponCode, setCouponCode] = useState('0');
   const [loyaltyPoints] = useState('1'); // Placeholder: "You have ₹1..."
   // const [loyaltyPoints, setLoyaltyPoints] = useState('1'); 
+
+  // Loyalty settings for points calculation
+  const [loyaltySettings, setLoyaltySettings] = useState(null);
 
   const [showPhoneError, setShowPhoneError] = useState(false);
 
@@ -977,23 +997,52 @@ const ReviewOrder = () => {
           )}
 
           {/* Login for Rewards Prompt - Show only if not logged in */}
-          {!isAuthenticated && (
-            <div className="review-order-login-prompt" data-testid="login-rewards-prompt">
-              <div className="login-prompt-content">
-                <IoGiftOutline className="login-prompt-icon" />
-                <div className="login-prompt-text">
-                  <span className="login-prompt-title">Earn rewards on this order!</span>
-                  <span className="login-prompt-subtitle">Login to collect points & unlock offers</span>
+          {!isAuthenticated && loyaltySettings && (
+            (() => {
+              // Calculate points to earn (using bronze tier for guests)
+              const earnPercent = loyaltySettings.bronze_earn_percent || 5;
+              const billAmount = totalToPay;
+              const pointsToEarn = Math.round(billAmount * (earnPercent / 100));
+              const redemptionValue = loyaltySettings.redemption_value || 0.25;
+              const pointsWorth = (pointsToEarn * redemptionValue).toFixed(0);
+              const firstVisitBonus = loyaltySettings.first_visit_bonus_enabled ? loyaltySettings.first_visit_bonus_points : 0;
+              const minOrderValue = loyaltySettings.min_order_value || 100;
+              const isEligible = billAmount >= minOrderValue;
+              
+              return (
+                <div className="review-order-login-prompt" data-testid="login-rewards-prompt">
+                  <div className="login-prompt-content">
+                    <IoGiftOutline className="login-prompt-icon" />
+                    <div className="login-prompt-text">
+                      {isEligible ? (
+                        <>
+                          <span className="login-prompt-title">
+                            Earn {pointsToEarn} points on this order!
+                          </span>
+                          <span className="login-prompt-subtitle">
+                            Worth ₹{pointsWorth}{firstVisitBonus > 0 ? ` + ${firstVisitBonus} bonus points for first visit` : ''}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="login-prompt-title">Earn rewards on this order!</span>
+                          <span className="login-prompt-subtitle">
+                            Add ₹{(minOrderValue - billAmount).toFixed(0)} more to earn points
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <button 
+                    className="login-prompt-btn"
+                    onClick={() => navigate('/login')}
+                    data-testid="login-rewards-btn"
+                  >
+                    Login
+                  </button>
                 </div>
-              </div>
-              <button 
-                className="login-prompt-btn"
-                onClick={() => navigate('/login')}
-                data-testid="login-rewards-btn"
-              >
-                Login
-              </button>
-            </div>
+              );
+            })()
           )}
 
           {/* Logged In User Info */}

@@ -65,7 +65,7 @@ const MenuItems = () => {
   }, [restaurantId, fetchConfig]);
 
   // Cart functionality
-  const { addToCart, updateQuantity, getTotalQuantityForItem, cartItems } = useCart();
+  const { addToCart, updateQuantity, getTotalQuantityForItem, cartItems, isEditMode, editingOrderId, clearEditMode } = useCart();
 
   // Get current time in seconds since midnight (updates every 60 seconds) - for item availability
   const currentTimeInSeconds = useCurrentTime();
@@ -499,6 +499,24 @@ const MenuItems = () => {
             activeFilter={activeFilter}
             onFilterChange={handleFilterChange}
           />
+
+          {/* Edit Order Mode Banner */}
+          {isEditMode && (
+            <div className="edit-mode-banner" data-testid="edit-mode-banner">
+              <div className="edit-mode-banner-content">
+                <span className="edit-mode-banner-text">
+                  Adding items to Order #{editingOrderId}
+                </span>
+                <button 
+                  className="edit-mode-banner-cancel"
+                  onClick={clearEditMode}
+                  data-testid="cancel-edit-mode-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Promo Banner - controlled by admin config */}
           {configShowPromotionsOnMenu && <PromoBanner promotions={restaurant?.promotions || []} compact />}

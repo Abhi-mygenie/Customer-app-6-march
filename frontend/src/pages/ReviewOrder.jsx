@@ -12,6 +12,7 @@ import { useRestaurantConfig } from '../context/RestaurantConfigContext';
 import { getAuthToken, isTokenExpired } from '../utils/authToken';
 import { placeOrder } from '../api/services/orderService';
 import OrderItemCard from '../components/OrderItemCard/OrderItemCard';
+import PreviousOrderItems from '../components/PreviousOrderItems/PreviousOrderItems';
 import { IoArrowBackOutline, IoGiftOutline, IoPersonOutline } from "react-icons/io5";
 import { isMultipleMenu } from '../api/utils/restaurantIdConfig';
 import { MdOutlineShoppingBag, MdOutlineTableRestaurant  } from "react-icons/md";
@@ -77,7 +78,18 @@ const ReviewOrder = () => {
   const params = useParams();
   const stationId = location.state?.stationId || params.stationId;
 
-  const { cartItems, getTotalItems, getTotalPrice, clearCart } = useCart();
+  const { 
+    cartItems, 
+    getTotalItems, 
+    getTotalPrice, 
+    clearCart,
+    // Edit order mode
+    isEditMode,
+    editingOrderId,
+    previousOrderItems,
+    clearEditMode,
+    getPreviousOrderTotal,
+  } = useCart();
 
   // Fetch restaurant details FIRST to get numeric ID
   const { restaurant } = useRestaurantDetails(restaurantId);
@@ -272,6 +284,9 @@ const ReviewOrder = () => {
 
   const totalItems = getTotalItems();
   const subtotal = getTotalPrice();
+  
+  // Previous order subtotal (for edit mode)
+  const previousSubtotal = isEditMode ? getPreviousOrderTotal() : 0;
 
   // Calculate totals (GST, VAT will be added in future)
   // ─── Tax Calculation (from cart items) ────────────────────────
@@ -318,7 +333,12 @@ const ReviewOrder = () => {
 
   // ─── Final totals ──────────────────────────────────────────────
   // const subtotal   = getTotalPrice();
-  const totalToPay = parseFloat((subtotal + totalTax).toFixed(2));
+  const newItemsTotal = parseFloat((subtotal + totalTax).toFixed(2));
+  
+  // In edit mode, add previous order subtotal to the total
+  const totalToPay = isEditMode 
+    ? parseFloat((previousSubtotal + newItemsTotal).toFixed(2))
+    : newItemsTotal;
 
   // console.log('totalTax', totalTax);
   // console.log('totalGst', totalGst);
@@ -762,12 +782,24 @@ const ReviewOrder = () => {
           {/* Divider after Customer Details */}
           {/* <div className="review-order-divider"></div> */}
 
+          {/* Previous Order Items - Show only in edit mode */}
+          {isEditMode && previousOrderItems && previousOrderItems.length > 0 && (
+            <>
+              <PreviousOrderItems 
+                items={previousOrderItems} 
+                orderId={editingOrderId}
+              />
+              <div className="review-order-divider"></div>
+            </>
+          )}
 
-          {/* Order Items */}
+          {/* Order Items - New items (editable) */}
           <div className="review-order-section">
             <div className="review-order-section-header">
               <div className="review-order-section-title-icon"><MdOutlineShoppingBag size={16} /></div>
-              <h2 className="review-order-section-title">Order Items</h2>
+              <h2 className="review-order-section-title">
+                {isEditMode ? 'New Items' : 'Order Items'}
+              </h2>
               <div className="review-order-items-badge">
                 <span className="review-order-items-count">{totalItems} items</span>
               </div>
@@ -803,9 +835,17 @@ const ReviewOrder = () => {
             </div>
             
             <div className="review-order-price-card">
-              {/* Subtotal */}
+              {/* Previous Order Subtotal - Show in edit mode */}
+              {isEditMode && previousSubtotal > 0 && (
+                <div className="price-row price-row-previous">
+                  <span className="price-label">Previous Order</span>
+                  <span className="price-value">₹{previousSubtotal.toFixed(2)}</span>
+                </div>
+              )}
+
+              {/* New Items Subtotal */}
               <div className="price-row">
-                <span className="price-label">Subtotal</span>
+                <span className="price-label">{isEditMode ? 'New Items' : 'Subtotal'}</span>
                 <span className="price-value">₹{subtotal.toFixed(2)}</span>
               </div>
 
@@ -870,7 +910,7 @@ const ReviewOrder = () => {
 
               {/* Total */}
               <div className="price-row price-row-total">
-                <span className="price-label-total">Total</span>
+                <span className="price-label-total">{isEditMode ? 'Grand Total' : 'Total'}</span>
                 <span className="price-value-total">₹{totalToPay.toFixed(2)}</span>
               </div>
             </div>

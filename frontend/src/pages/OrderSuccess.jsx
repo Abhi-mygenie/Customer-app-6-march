@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRestaurantId } from '../utils/useRestaurantId';
 import { useRestaurantDetails } from '../hooks/useMenuData';
 import { useRestaurantConfig } from '../context/RestaurantConfigContext';
 import { useScannedTable } from '../hooks/useScannedTable';
+import { useCart } from '../context/CartContext';
 import { isMultipleMenu } from '../api/utils/restaurantIdConfig';
+import { getOrderDetails } from '../api/services/orderService';
 import Header from '../components/Header/Header';
 import { IoCheckmarkCircle, IoCallOutline } from 'react-icons/io5';
 import { RiBillLine } from 'react-icons/ri';
@@ -38,6 +40,8 @@ const OrderSuccess = () => {
   const { restaurant } = useRestaurantDetails(restaurantId);
   const { logoUrl: configLogoUrl, phone: configPhone, fetchConfig } = useRestaurantConfig();
   const { tableNo: scannedTableNo, roomOrTable: scannedRoomOrTable, isScanned } = useScannedTable();
+  const { startEditOrder } = useCart();
+  const [isLoadingEdit, setIsLoadingEdit] = useState(false);
 
   const orderData = location.state?.orderData || null;
 
@@ -77,8 +81,41 @@ const OrderSuccess = () => {
     }
   };
 
-  const handleEditOrder = () => {
-    navigate(`/${restaurantId}/review-order`, { replace: true });
+  const handleEditOrder = async () => {
+    if (!orderData?.orderId) {
+      console.error('No order ID available for editing');
+      return;
+    }
+
+    setIsLoadingEdit(true);
+    try {
+      // Fetch order details from API
+      const orderDetails = await getOrderDetails(orderData.orderId);
+      
+      // Start edit mode with previous items
+      startEditOrder(
+        orderData.orderId,
+        orderDetails.previousItems,
+        {
+          tableId: orderDetails.tableId,
+          tableNo: orderDetails.tableNo,
+          restaurant: orderDetails.restaurant,
+        }
+      );
+
+      // Navigate to menu to add more items
+      if (isMultipleMenu(restaurant, restaurantId)) {
+        navigate(`/${restaurantId}/stations`, { replace: true });
+      } else {
+        navigate(`/${restaurantId}/menu`, { replace: true });
+      }
+    } catch (error) {
+      console.error('Failed to fetch order details for editing:', error);
+      // Still allow navigation even if API fails
+      navigate(`/${restaurantId}/review-order`, { replace: true });
+    } finally {
+      setIsLoadingEdit(false);
+    }
   };
 
   const handleCallWaiter = () => {
@@ -215,10 +252,11 @@ const OrderSuccess = () => {
             <button
               className="order-success-action-btn order-success-action-edit"
               onClick={handleEditOrder}
+              disabled={isLoadingEdit}
               data-testid="order-success-edit-btn"
             >
               <MdOutlineEdit className="order-success-action-icon" />
-              Edit Order
+              {isLoadingEdit ? 'Loading...' : 'Edit Order'}
             </button>
           )}
 

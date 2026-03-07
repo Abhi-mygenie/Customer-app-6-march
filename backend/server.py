@@ -497,6 +497,30 @@ async def get_customer_orders(
         items=o.get("items", [])
     ) for o in orders]
 
+# Air BnB router for order details (Edit Order feature)
+air_bnb_router = APIRouter(prefix="/air-bnb", tags=["Air BnB"])
+
+@air_bnb_router.get("/get-order-details/{order_id}")
+async def get_order_details(order_id: str):
+    """Get order details for edit order feature"""
+    
+    # Check if order exists in database
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    
+    if not order:
+        raise HTTPException(status_code=404, detail=f"Order {order_id} not found")
+    
+    # Transform order data to expected format
+    return {
+        "id": order["id"],
+        "order_id": order["id"],
+        "table_id": order.get("table_id", ""),
+        "table_no": order.get("table_no", ""),
+        "restaurant": order.get("restaurant", {}),
+        "delivery_charge": order.get("delivery_charge", "0"),
+        "details": order.get("details", [])
+    }
+
 @customer_router.get("/points", response_model=List[PointsTransaction])
 async def get_customer_points(
     limit: int = 50,
@@ -935,6 +959,7 @@ api_router.include_router(auth_router)
 api_router.include_router(customer_router)
 api_router.include_router(config_router)
 api_router.include_router(upload_router)
+api_router.include_router(air_bnb_router)  # Add air-bnb router
 app.include_router(api_router)
 
 # CORS Middleware

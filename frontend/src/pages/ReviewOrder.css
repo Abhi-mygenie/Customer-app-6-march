@@ -873,6 +873,21 @@
   align-items: center;
 }
 
+/* Previous order row in edit mode */
+.price-row-previous {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--border-light, #ddd);
+}
+
+.price-row-previous .price-label {
+  color: var(--text-tertiary, #888);
+}
+
+.price-row-previous .price-value {
+  color: var(--text-tertiary, #888);
+}
+
 .price-label {
   font-family: var(--font-body);
   font-size: var(--font-size-sm);

@@ -6,6 +6,46 @@
   position: relative;
 }
 
+/* Edit Mode Banner */
+.edit-mode-banner {
+  background: linear-gradient(135deg, var(--color-primary, #ff6b35) 0%, var(--color-primary-dark, #e55a2b) 100%);
+  color: var(--text-white, #fff);
+  padding: 10px 16px;
+  margin: 0 12px 12px 12px;
+  border-radius: var(--radius-container-md, 8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.edit-mode-banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-mode-banner-text {
+  font-family: var(--font-body, 'Montserrat', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.edit-mode-banner-cancel {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--text-white, #fff);
+  padding: 6px 14px;
+  border-radius: var(--radius-button, 6px);
+  font-family: var(--font-body, 'Montserrat', sans-serif);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-mode-banner-cancel:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 /* Error Message */
 .error-message {
   padding: var(--spacing-lg);

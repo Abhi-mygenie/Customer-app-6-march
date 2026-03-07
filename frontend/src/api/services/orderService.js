@@ -782,3 +782,55 @@ const orderService = {
 };
 
 export default orderService;
+
+/**
+ * Fetch order details for editing
+ * @param {string|number} orderId - Order ID to fetch
+ * @returns {Promise<Object>} Order details with items
+ */
+export const getOrderDetails = async (orderId) => {
+  try {
+    const response = await apiClient.get(ENDPOINTS.GET_ORDER_DETAILS(orderId), {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    // Transform API response to cart-friendly format
+    const orderData = response.data;
+    const previousItems = (orderData.details || []).map(detail => ({
+      id: detail.id,
+      foodId: detail.food_id,
+      orderId: detail.order_id,
+      quantity: detail.quantity,
+      unitPrice: parseFloat(detail.unit_price) || 0,
+      price: detail.price,
+      item: {
+        id: detail.food_details?.id,
+        name: detail.food_details?.name || 'Unknown Item',
+        description: detail.food_details?.description || '',
+        image: detail.food_details?.image || '',
+        price: detail.food_details?.price || detail.price,
+        veg: detail.food_details?.veg === 1,
+        tax: detail.food_details?.tax || 0,
+        tax_type: detail.food_details?.tax_type || 'GST',
+      },
+      variations: detail.variation || [],
+      add_ons: detail.add_ons || [],
+      foodLevelNotes: detail.food_level_notes || '',
+      foodStatus: detail.food_status,
+    }));
+
+    return {
+      orderId: orderId,
+      previousItems,
+      tableId: orderData.table_id,
+      tableNo: orderData.table_no,
+      restaurant: orderData.restaurant,
+      deliveryCharge: orderData.delivery_charge,
+    };
+  } catch (error) {
+    console.error('[OrderService] Failed to fetch order details:', error);
+    throw error;
+  }
+};

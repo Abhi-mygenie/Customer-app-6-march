@@ -93,12 +93,7 @@ const PreviousOrderItems = ({ items, orderId }) => {
           <IoLockClosedOutline className="previous-order-lock-icon" />
           <h3 className="previous-order-title">Previously Ordered</h3>
         </div>
-        {orderId && (
-          <span className="previous-order-id">Order #{orderId}</span>
-        )}
       </div>
-
-      <p className="previous-order-subtitle">These items cannot be modified</p>
 
       {/* Items List */}
       <div className="previous-order-items-list">
@@ -121,12 +116,6 @@ const PreviousOrderItems = ({ items, orderId }) => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Subtotal */}
-      <div className="previous-order-subtotal">
-        <span className="previous-order-subtotal-label">Previous Order Subtotal</span>
-        <span className="previous-order-subtotal-value">₹{subtotal.toFixed(2)}</span>
       </div>
     </div>
   );

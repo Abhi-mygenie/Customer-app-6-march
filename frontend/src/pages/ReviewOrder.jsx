@@ -912,18 +912,10 @@ const ReviewOrder = () => {
             </div>
             
             <div className="review-order-price-card">
-              {/* Previous Order Subtotal - Show in edit mode */}
-              {isEditMode && previousSubtotal > 0 && (
-                <div className="price-row price-row-previous">
-                  <span className="price-label">Previous Order</span>
-                  <span className="price-value">₹{previousSubtotal.toFixed(2)}</span>
-                </div>
-              )}
-
-              {/* New Items Subtotal */}
+              {/* Combined Subtotal */}
               <div className="price-row">
-                <span className="price-label">{isEditMode ? 'New Items' : 'Subtotal'}</span>
-                <span className="price-value">₹{subtotal.toFixed(2)}</span>
+                <span className="price-label">Subtotal</span>
+                <span className="price-value">₹{(previousSubtotal + subtotal).toFixed(2)}</span>
               </div>
 
               {/* Coupon Code - inline */}
@@ -955,16 +947,6 @@ const ReviewOrder = () => {
                 </div>
               )}
 
-              {/* Discount lines - show when applied */}
-              {/* {couponDiscount > 0 && (
-                <div className="price-row price-row-discount">
-                  <span className="price-label">Coupon Discount</span>
-                  <span className="price-value price-discount">-₹{couponDiscount.toFixed(2)}</span>
-                </div>
-              )} */}
-
-              <div className="price-divider"></div>
-
               {/* GST/VAT if applicable */}
               {totalGst > 0 && (
                 <>
@@ -987,7 +969,7 @@ const ReviewOrder = () => {
 
               {/* Total */}
               <div className="price-row price-row-total">
-                <span className="price-label-total">{isEditMode ? 'Grand Total' : 'Total'}</span>
+                <span className="price-label-total">Grand Total</span>
                 <span className="price-value-total">₹{totalToPay.toFixed(2)}</span>
               </div>
             </div>

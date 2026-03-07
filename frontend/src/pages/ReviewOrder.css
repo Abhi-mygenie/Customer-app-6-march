@@ -960,12 +960,9 @@
   opacity: 0.9;
 }
 
-/* Divider inside price card */
+/* Divider inside price card - using orange line */
 .price-divider {
-  height: 1px;
-  background: var(--border-dark);
-  margin: var(--spacing-xs) 0;
-  border-style: dashed;
+  display: none; /* Hidden - using orange line from total row border */
 }
 
 /* Sub rows for taxes */

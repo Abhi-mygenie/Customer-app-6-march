@@ -318,7 +318,7 @@ const OrderSuccess = () => {
         </div>
 
         {/* Items Ordered - Collapsible */}
-        {allItems.length > 0 && (
+        {(isLoadingStatus || allItems.length > 0) && (
           <div className="order-success-items-card">
             <div 
               className="order-success-items-header"
@@ -326,7 +326,7 @@ const OrderSuccess = () => {
               data-testid="toggle-items-btn"
             >
               <span className="order-success-items-title">
-                Items Ordered ({totalItemsCount})
+                {isLoadingStatus ? 'Loading Items...' : `Items Ordered (${totalItemsCount})`}
               </span>
               <span className="order-success-items-toggle">
                 {showItems ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
@@ -334,8 +334,15 @@ const OrderSuccess = () => {
             </div>
             {showItems && (
               <div className="order-success-items-list">
+                {/* Loading State */}
+                {isLoadingStatus && (
+                  <div className="order-success-items-loading">
+                    <span>Fetching order details...</span>
+                  </div>
+                )}
+                
                 {/* Previous Items Section */}
-                {isEditedOrder && previousItems.length > 0 && (
+                {!isLoadingStatus && isEditedOrder && previousItems.length > 0 && (
                   <>
                     <div className="order-success-items-section-label">
                       Previous Order
@@ -361,7 +368,7 @@ const OrderSuccess = () => {
                 )}
 
                 {/* New Items Section */}
-                {newItems.length > 0 && (
+                {!isLoadingStatus && newItems.length > 0 && (
                   <>
                     {isEditedOrder && previousItems.length > 0 && (
                       <div className="order-success-items-section-label order-success-items-section-new">

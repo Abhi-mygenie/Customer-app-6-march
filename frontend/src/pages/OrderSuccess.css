@@ -650,3 +650,11 @@
 .order-success-action-primary {
   /* These classes are no longer used but kept for safety */
 }
+
+/* Loading state for items */
+.order-success-items-loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}

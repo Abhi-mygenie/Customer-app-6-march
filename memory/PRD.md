@@ -30,28 +30,45 @@ Pull and build the Customer App from https://github.com/Abhi-mygenie/Customer-ap
 5. **Environment Switch** - Switched from production to preprod API
 
 ### Session 2 (March 7, 2026) - Edit Order Feature
-1. **API Integration** (`/api/air-bnb/get-order-details/{orderId}`)
+1. **API Integration**
+   - `GET /api/air-bnb/get-order-details/{orderId}` - Fetch previous order items
+   - `POST /customer/order/update-customer-order` - Submit new items to existing order
+   
 2. **CartContext Extended** - Added edit mode state management:
    - `isEditMode`, `editingOrderId`, `previousOrderItems`
    - `startEditOrder()`, `clearEditMode()`, `getEditOrderPayload()`
-3. **PreviousOrderItems Component** - Read-only display of previous order items
+   
+3. **PreviousOrderItems Component** - Read-only display of previous order items with:
+   - Lock icon and "These items cannot be modified" message
+   - Order ID badge
+   - Subtotal calculation
+   
 4. **ReviewOrder Page Updates** - Split view showing:
    - "Previously Ordered" section (locked items)
    - "New Items" section (editable)
-   - Combined price breakdown with Grand Total
+   - Combined price breakdown (Previous Order + New Items)
+   - Dynamic button: "Update Order" vs "Place Order"
+   
 5. **Menu Page Edit Banner** - Shows "Adding items to Order #XXXXX" with Cancel button
+
 6. **OrderSuccess Page** - Edit Order button triggers the flow
+
+7. **Order Submission** - `updateCustomerOrder()` API integration with:
+   - FormData format with JSON payload
+   - Authorization token handling
+   - Cart transformation to API format (food_id, variations, add_ons, etc.)
 
 ## API Endpoints
 - `GET /api/air-bnb/get-order-details/{orderId}` - Fetch order details for editing
+- `POST /api/customer/order/update-customer-order` - Update existing order with new items
 - `POST /api/customer/order/place` - Place new order
 - `GET /api/web/restaurant-info` - Get restaurant details
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- [ ] Order submission with combined previous + new items payload
-- [ ] Integration testing with real order IDs
+- [x] Order submission with combined previous + new items payload ✅
+- [ ] Integration testing with real order IDs and auth tokens
 
 ### P1 (High)
 - [ ] Call Waiter API integration
@@ -64,11 +81,11 @@ Pull and build the Customer App from https://github.com/Abhi-mygenie/Customer-ap
 - [ ] Multiple payment methods
 
 ## Next Tasks
-1. Test full edit order submission flow
+1. Test full edit order flow with production auth token
 2. Implement order status real-time updates
 3. Add payment integration
 
 ## Test Credentials
 - **Admin Email**: demo@restaurant.com
 - **Admin Password**: demo123
-- **Test Order ID**: 243057
+- **Test Order ID**: 630935, 243057

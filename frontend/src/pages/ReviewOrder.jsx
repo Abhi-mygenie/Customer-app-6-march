@@ -10,7 +10,7 @@ import { useScannedTable } from '../hooks/useScannedTable';
 import { useAuth } from '../context/AuthContext';
 import { useRestaurantConfig } from '../context/RestaurantConfigContext';
 import { getAuthToken, isTokenExpired } from '../utils/authToken';
-import { placeOrder } from '../api/services/orderService';
+import { placeOrder, updateCustomerOrder } from '../api/services/orderService';
 import OrderItemCard from '../components/OrderItemCard/OrderItemCard';
 import PreviousOrderItems from '../components/PreviousOrderItems/PreviousOrderItems';
 import { IoArrowBackOutline, IoGiftOutline, IoPersonOutline } from "react-icons/io5";
@@ -464,42 +464,54 @@ const ReviewOrder = () => {
       }
     }
 
-    // Place order
+    // Place order or Update order (if in edit mode)
     setIsPlacingOrder(true);
     try {
-      // Format table number for API: R#table_no or T#table_no
-      // let formattedTableNumber = tableNumber;
-      // if (isRestaurant716 && roomOrTable && tableNumber) {
-      //   const source = roomOrTable === 'room' ? rooms : tables;
-      //   const selectedItem = source.find(item => item.id.toString() === tableNumber);
-      //   if (selectedItem) {
-      //     formattedTableNumber = `${roomOrTable === 'table' ? 'T' : 'R'}#${selectedItem.table_no}`;
-      //   }
-      // }
       // Use scanned table if available, otherwise use manual selection
       const finalTableId = (isScanned && scannedOrderType === 'dinein' && scannedTableId)
         ? scannedTableId
         : (isRestaurant716 && tableNumber ? tableNumber : '');
 
-      // console.log('tableId (for table_id field):', finalTableId);
+      let response;
 
-      // console.log('formattedTableNumber', tableNumber);
+      // Check if we're in edit mode
+      if (isEditMode && editingOrderId) {
+        // Update existing order with new items
+        response = await updateCustomerOrder({
+          orderId: editingOrderId,
+          cartItems,
+          restaurantId,
+          tableId: finalTableId,
+          orderType: scannedOrderType || 'dinein',
+          paymentType: 'postpaid',
+          orderNote: specialInstructions,
+          authToken: token,
+          customerName,
+          customerPhone: customerPhone || '',
+        });
 
-      const response = await placeOrder({
-        cartItems,
-        customerName,
-        customerPhone: customerPhone || '',
-        tableNumber: finalTableId,
-        specialInstructions,
-        couponCode,
-        restaurantId,
-        subtotal,
-        totalToPay,
-        totalTax,
-        orderType: scannedOrderType,
-        isMultipleMenuType: isRestaurant716,
-        token
-      });
+        // Clear edit mode after successful update
+        clearEditMode();
+        
+        toast.success('Order updated successfully!');
+      } else {
+        // Place new order
+        response = await placeOrder({
+          cartItems,
+          customerName,
+          customerPhone: customerPhone || '',
+          tableNumber: finalTableId,
+          specialInstructions,
+          couponCode,
+          restaurantId,
+          subtotal,
+          totalToPay,
+          totalTax,
+          orderType: scannedOrderType,
+          isMultipleMenuType: isRestaurant716,
+          token
+        });
+      }
 
       // Clear cart after successful order
       clearCart();
@@ -508,8 +520,9 @@ const ReviewOrder = () => {
       navigate(`/${restaurantId}/order-success`, {
         state: {
           orderData: {
-            orderId: response?.order_id || null,
-            totalToPay: response?.total_amount || totalToPay.toFixed(2)
+            orderId: response?.order_id || editingOrderId || null,
+            totalToPay: response?.total_amount || totalToPay.toFixed(2),
+            isEditedOrder: isEditMode
           }
         }
       });
@@ -529,22 +542,45 @@ const ReviewOrder = () => {
             ? scannedTableId
             : (isRestaurant716 && tableNumber ? tableNumber : '');
 
-          // Retry order placement
-          const retryResponse = await placeOrder({
-            cartItems,
-            customerName,
-            customerPhone: customerPhone || '',
-            tableNumber: retryTableId,
-            specialInstructions,
-            couponCode,
-            restaurantId,
-            orderType: scannedOrderType,
-            subtotal,
-            totalToPay,
-            totalTax,
-            isMultipleMenuType: isRestaurant716,
-            token: newToken
-          });
+          let retryResponse;
+
+          // Check if we're in edit mode for retry
+          if (isEditMode && editingOrderId) {
+            retryResponse = await updateCustomerOrder({
+              orderId: editingOrderId,
+              cartItems,
+              restaurantId,
+              tableId: retryTableId,
+              orderType: scannedOrderType || 'dinein',
+              paymentType: 'postpaid',
+              orderNote: specialInstructions,
+              authToken: newToken,
+              customerName,
+              customerPhone: customerPhone || '',
+            });
+
+            // Clear edit mode after successful update
+            clearEditMode();
+            
+            toast.success('Order updated successfully!');
+          } else {
+            // Retry order placement
+            retryResponse = await placeOrder({
+              cartItems,
+              customerName,
+              customerPhone: customerPhone || '',
+              tableNumber: retryTableId,
+              specialInstructions,
+              couponCode,
+              restaurantId,
+              orderType: scannedOrderType,
+              subtotal,
+              totalToPay,
+              totalTax,
+              isMultipleMenuType: isRestaurant716,
+              token: newToken
+            });
+          }
 
           // Clear cart after successful order
           clearCart();
@@ -553,8 +589,9 @@ const ReviewOrder = () => {
           navigate(`/${restaurantId}/order-success`, {
             state: {
               orderData: {
-                orderId: retryResponse?.order_id || null,
-                totalToPay: retryResponse?.total_amount || totalToPay.toFixed(2)
+                orderId: retryResponse?.order_id || editingOrderId || null,
+                totalToPay: retryResponse?.total_amount || totalToPay.toFixed(2),
+                isEditedOrder: isEditMode
               }
             }
           });
@@ -567,7 +604,7 @@ const ReviewOrder = () => {
         // Other errors
         const errorMessage = error.response?.data?.message ||
           error.response?.data?.errors?.message ||
-          'Failed to place order. Please try again.';
+          (isEditMode ? 'Failed to update order. Please try again.' : 'Failed to place order. Please try again.');
         toast.error(errorMessage);
       }
     } finally {
@@ -957,8 +994,15 @@ const ReviewOrder = () => {
             className="review-order-place-btn"
             onClick={handlePlaceOrder}
             disabled={totalItems === 0 || isPlacingOrder || isLoadingToken}
+            data-testid="place-order-btn"
           >
-            {isPlacingOrder ? 'Placing Order...' : `Place Order ₹${totalToPay.toFixed(2)}`}
+            {isPlacingOrder 
+              ? (isEditMode ? 'Updating Order...' : 'Placing Order...') 
+              : (isEditMode 
+                  ? `Update Order ₹${totalToPay.toFixed(2)}` 
+                  : `Place Order ₹${totalToPay.toFixed(2)}`
+                )
+            }
           </button>
         </div>
       </div>

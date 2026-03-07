@@ -133,6 +133,7 @@ class AppConfigUpdate(BaseModel):
     showHamburgerMenu: Optional[bool] = None
     showLoginButton: Optional[bool] = None
     showEstimatedTimes: Optional[bool] = None
+    showFoodStatus: Optional[bool] = None  # Food Item Status (Preparing/Ready/Served)
     # Branding - Colors
     logoUrl: Optional[str] = None
     backgroundImageUrl: Optional[str] = None

@@ -8,12 +8,10 @@ import { useCart } from '../context/CartContext';
 import { isMultipleMenu } from '../api/utils/restaurantIdConfig';
 import { getOrderDetails } from '../api/services/orderService';
 import Header from '../components/Header/Header';
-import { IoCheckmarkCircle, IoCallOutline } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoCallOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import { RiBillLine } from 'react-icons/ri';
 import { MdOutlineEdit, MdOutlineRestaurantMenu, MdOutlineTableRestaurant } from 'react-icons/md';
 import { FaDoorOpen } from 'react-icons/fa';
-import { IoTimeOutline } from 'react-icons/io5';
-import { RiHashtag } from 'react-icons/ri';
 import './OrderSuccess.css';
 
 // Helper: check if a success_config flag is enabled (defaults to Y)
@@ -42,8 +40,10 @@ const OrderSuccess = () => {
   const { tableNo: scannedTableNo, roomOrTable: scannedRoomOrTable, isScanned } = useScannedTable();
   const { startEditOrder } = useCart();
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
+  const [showItems, setShowItems] = useState(true);
 
   const orderData = location.state?.orderData || null;
+  const orderItems = orderData?.items || [];
 
   // Fetch admin config for this restaurant
   useEffect(() => {
@@ -135,8 +135,9 @@ const OrderSuccess = () => {
   const showEditOrder = isConfigEnabled(restaurant, 'show_edit_order');
   const showGoToMenu = isConfigEnabled(restaurant, 'show_go_to_menu');
   const showTableNumber = isConfigEnabled(restaurant, 'show_table_number') && isScanned && scannedTableNo;
-  const showPrepTime = isConfigEnabled(restaurant, 'show_prep_time');
-  const showTokenNumber = isConfigEnabled(restaurant, 'show_token_number');
+
+  // Calculate total items count
+  const totalItemsCount = orderItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   return (
     <div className="order-success-page" data-testid="order-success-page">
@@ -148,85 +149,90 @@ const OrderSuccess = () => {
       />
       <div className="order-success-container">
 
-        {/* Success Icon + Title */}
-        <div className="order-success-hero">
-          <div className="order-success-icon" data-testid="order-success-icon">
+        {/* Compact Hero: Icon + Title inline */}
+        <div className="order-success-hero-compact">
+          <div className="order-success-icon-small" data-testid="order-success-icon">
             <IoCheckmarkCircle />
           </div>
-          <h1 className="order-success-title">Order Placed!</h1>
-          <p className="order-success-message">
-            Your order has been received and is being processed.
-          </p>
+          <div className="order-success-hero-text">
+            <h1 className="order-success-title-compact">Order Placed!</h1>
+            <p className="order-success-message-compact">
+              Your order is being processed
+            </p>
+          </div>
         </div>
 
-        {/* Order Details Card */}
-        <div className="order-success-card" data-testid="order-success-card">
-          <div className="order-success-card-row">
-            <span className="order-success-card-label">Order ID</span>
-            <span className="order-success-card-value">#{orderData.orderId || 'N/A'}</span>
-          </div>
-          <div className="order-success-card-divider"></div>
-          <div className="order-success-card-row">
-            <span className="order-success-card-label">Total</span>
-            <span className="order-success-card-value order-success-card-total">₹{orderData.totalToPay || '0.00'}</span>
+        {/* Order Details Card - Compact */}
+        <div className="order-success-card-compact" data-testid="order-success-card">
+          {/* Order ID + Total in one row */}
+          <div className="order-success-main-row">
+            <div className="order-success-order-info">
+              <span className="order-success-order-label">Order</span>
+              <span className="order-success-order-id">#{orderData.orderId || 'N/A'}</span>
+            </div>
+            <span className="order-success-total">₹{orderData.totalToPay || '0.00'}</span>
           </div>
 
-          {/* Table Number */}
+          {/* Table Number - inline */}
           {showTableNumber && (
-            <>
-              <div className="order-success-card-divider"></div>
-              <div className="order-success-card-row" data-testid="order-success-table">
-                <span className="order-success-card-label">
-                  <span className="order-success-card-label-icon">
-                    {scannedRoomOrTable === 'room' ? <FaDoorOpen /> : <MdOutlineTableRestaurant />}
-                  </span>
-                  {scannedRoomOrTable === 'room' ? 'Room' : 'Table'}
-                </span>
-                <span className="order-success-card-value">{scannedTableNo}</span>
-              </div>
-            </>
-          )}
-
-          {/* Token Number */}
-          {showTokenNumber && orderData.tokenNumber && (
-            <>
-              <div className="order-success-card-divider"></div>
-              <div className="order-success-card-row" data-testid="order-success-token">
-                <span className="order-success-card-label">
-                  <span className="order-success-card-label-icon"><RiHashtag /></span>
-                  Token
-                </span>
-                <span className="order-success-card-value order-success-card-token">{orderData.tokenNumber}</span>
-              </div>
-            </>
-          )}
-
-          {/* Preparation Time */}
-          {showPrepTime && orderData.prepTime && (
-            <>
-              <div className="order-success-card-divider"></div>
-              <div className="order-success-card-row" data-testid="order-success-prep-time">
-                <span className="order-success-card-label">
-                  <span className="order-success-card-label-icon"><IoTimeOutline /></span>
-                  Prep Time
-                </span>
-                <span className="order-success-card-value order-success-card-prep">{orderData.prepTime}</span>
-              </div>
-            </>
+            <div className="order-success-table-row">
+              <span className="order-success-table-icon">
+                {scannedRoomOrTable === 'room' ? <FaDoorOpen /> : <MdOutlineTableRestaurant />}
+              </span>
+              <span className="order-success-table-label">
+                {scannedRoomOrTable === 'room' ? 'Room' : 'Table'}
+              </span>
+              <span className="order-success-table-value">{scannedTableNo}</span>
+            </div>
           )}
         </div>
 
-        {/* Order Status Tracker */}
+        {/* Items Ordered - Collapsible */}
+        {orderItems.length > 0 && (
+          <div className="order-success-items-card">
+            <div 
+              className="order-success-items-header"
+              onClick={() => setShowItems(!showItems)}
+              data-testid="toggle-items-btn"
+            >
+              <span className="order-success-items-title">
+                Items Ordered ({totalItemsCount})
+              </span>
+              <span className="order-success-items-toggle">
+                {showItems ? <IoChevronUpOutline /> : <IoChevronDownOutline />}
+              </span>
+            </div>
+            {showItems && (
+              <div className="order-success-items-list">
+                {orderItems.map((item, index) => (
+                  <div key={index} className="order-success-item-row">
+                    <div className="order-success-item-info">
+                      <span className={`order-success-item-veg ${item.veg ? 'veg' : 'non-veg'}`}>
+                        <span className="veg-dot"></span>
+                      </span>
+                      <span className="order-success-item-name">{item.name || item.item?.name || 'Item'}</span>
+                      <span className="order-success-item-qty">x{item.quantity || 1}</span>
+                    </div>
+                    <span className="order-success-item-price">
+                      ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Order Status Tracker - Compact */}
         {showOrderStatus && (
-          <div className="order-status-tracker" data-testid="order-status-tracker">
-            <h3 className="order-status-heading">Order Status</h3>
-            <div className="order-status-steps">
+          <div className="order-status-tracker-compact" data-testid="order-status-tracker">
+            <div className="order-status-steps-compact">
               {ORDER_STATUSES.map((step, idx) => {
                 const isCompleted = idx <= currentStepIndex;
                 const isCurrent = idx === currentStepIndex;
                 return (
-                  <div key={step.key} className={`order-status-step ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}>
-                    <div className="order-status-dot">
+                  <div key={step.key} className={`order-status-step-compact ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}`}>
+                    <div className="order-status-dot-compact">
                       {isCompleted && (
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                           <path d="M5 13l4 4L19 7" />
@@ -234,9 +240,9 @@ const OrderSuccess = () => {
                       )}
                     </div>
                     {idx < ORDER_STATUSES.length - 1 && (
-                      <div className={`order-status-line ${isCompleted && idx < currentStepIndex ? 'filled' : ''}`}></div>
+                      <div className={`order-status-line-compact ${isCompleted && idx < currentStepIndex ? 'filled' : ''}`}></div>
                     )}
-                    <span className="order-status-label">{step.label}</span>
+                    <span className="order-status-label-compact">{step.label}</span>
                   </div>
                 );
               })}
@@ -244,56 +250,51 @@ const OrderSuccess = () => {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="order-success-actions" data-testid="order-success-actions">
+        {/* Action Buttons - Compact */}
+        <div className="order-success-actions-compact" data-testid="order-success-actions">
+          {/* Top row: Edit + Call Waiter + Pay Bill */}
+          <div className="order-success-btn-row">
+            {showEditOrder && (
+              <button
+                className="order-success-btn order-success-btn-outline"
+                onClick={handleEditOrder}
+                disabled={isLoadingEdit}
+                data-testid="order-success-edit-btn"
+              >
+                <MdOutlineEdit />
+                {isLoadingEdit ? '...' : 'Edit'}
+              </button>
+            )}
+            {showCallWaiter && (
+              <button
+                className="order-success-btn order-success-btn-outline"
+                onClick={handleCallWaiter}
+                data-testid="order-success-call-waiter-btn"
+              >
+                <IoCallOutline />
+                Call
+              </button>
+            )}
+            {showPayBill && (
+              <button
+                className="order-success-btn order-success-btn-outline"
+                onClick={handlePayBill}
+                data-testid="order-success-pay-bill-btn"
+              >
+                <RiBillLine />
+                Pay
+              </button>
+            )}
+          </div>
 
-          {/* Edit Order */}
-          {showEditOrder && (
-            <button
-              className="order-success-action-btn order-success-action-edit"
-              onClick={handleEditOrder}
-              disabled={isLoadingEdit}
-              data-testid="order-success-edit-btn"
-            >
-              <MdOutlineEdit className="order-success-action-icon" />
-              {isLoadingEdit ? 'Loading...' : 'Edit Order'}
-            </button>
-          )}
-
-          {/* Call Waiter + Pay Bill Row */}
-          {(showCallWaiter || showPayBill) && (
-            <div className="order-success-action-row">
-              {showCallWaiter && (
-                <button
-                  className="order-success-action-btn order-success-action-secondary"
-                  onClick={handleCallWaiter}
-                  data-testid="order-success-call-waiter-btn"
-                >
-                  <IoCallOutline className="order-success-action-icon" />
-                  Call Waiter
-                </button>
-              )}
-              {showPayBill && (
-                <button
-                  className="order-success-action-btn order-success-action-secondary"
-                  onClick={handlePayBill}
-                  data-testid="order-success-pay-bill-btn"
-                >
-                  <RiBillLine className="order-success-action-icon" />
-                  Pay Bill
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Go to Menu */}
+          {/* Browse Menu - Full width */}
           {showGoToMenu && (
             <button
-              className="order-success-action-btn order-success-action-primary"
+              className="order-success-btn order-success-btn-primary"
               onClick={handleGoToMenu}
               data-testid="order-success-menu-btn"
             >
-              <MdOutlineRestaurantMenu className="order-success-action-icon" />
+              <MdOutlineRestaurantMenu />
               Browse Menu
             </button>
           )}

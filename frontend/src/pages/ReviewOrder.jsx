@@ -516,13 +516,23 @@ const ReviewOrder = () => {
       // Clear cart after successful order
       clearCart();
 
+      // Prepare items for order success page
+      const orderItems = cartItems.map(item => ({
+        name: item.item?.name || 'Item',
+        quantity: item.quantity,
+        price: item.item?.price || item.totalPrice / item.quantity,
+        totalPrice: item.totalPrice,
+        veg: item.item?.veg === 1 || item.item?.veg === true
+      }));
+
       // Navigate to success page with order data
       navigate(`/${restaurantId}/order-success`, {
         state: {
           orderData: {
             orderId: response?.order_id || editingOrderId || null,
             totalToPay: response?.total_amount || totalToPay.toFixed(2),
-            isEditedOrder: isEditMode
+            isEditedOrder: isEditMode,
+            items: orderItems
           }
         }
       });
@@ -585,13 +595,23 @@ const ReviewOrder = () => {
           // Clear cart after successful order
           clearCart();
 
+          // Prepare items for order success page
+          const retryOrderItems = cartItems.map(item => ({
+            name: item.item?.name || 'Item',
+            quantity: item.quantity,
+            price: item.item?.price || item.totalPrice / item.quantity,
+            totalPrice: item.totalPrice,
+            veg: item.item?.veg === 1 || item.item?.veg === true
+          }));
+
           // Navigate to success page
           navigate(`/${restaurantId}/order-success`, {
             state: {
               orderData: {
                 orderId: retryResponse?.order_id || editingOrderId || null,
                 totalToPay: retryResponse?.total_amount || totalToPay.toFixed(2),
-                isEditedOrder: isEditMode
+                isEditedOrder: isEditMode,
+                items: retryOrderItems
               }
             }
           });

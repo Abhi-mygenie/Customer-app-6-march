@@ -18,7 +18,12 @@ import './OrderSuccess.css';
  * Maps f_order_status numeric value to status string
  * 1 → Preparing, 2 → Ready, 3 → Cancelled, 5 → Served, 6 → Paid, 7 → Yet to be confirmed
  */
-const mapFoodOrderStatus = (item) => {
+const mapFoodOrderStatus = (item, isNewItem = false) => {
+  // For newly added items (not yet confirmed by kitchen), default to pending
+  if (isNewItem && !item?.f_order_status && !item?.food_status && !item?.status) {
+    return 'pending';
+  }
+
   // Check for f_order_status (numeric) first
   const fStatus = item?.f_order_status;
   if (fStatus !== undefined && fStatus !== null) {
@@ -30,7 +35,7 @@ const mapFoodOrderStatus = (item) => {
       6: 'paid',
       7: 'pending'
     };
-    return statusMap[fStatus] || 'preparing';
+    return statusMap[fStatus] || 'pending';
   }
   
   // Fallback to food_status or status (string)
@@ -39,7 +44,8 @@ const mapFoodOrderStatus = (item) => {
     return stringStatus.toLowerCase();
   }
   
-  return 'preparing';
+  // Default to pending (yet to be confirmed) instead of preparing
+  return 'pending';
 };
 
 /**
@@ -377,7 +383,7 @@ const OrderSuccess = () => {
                           <span className="order-success-item-price">
                             ₹{((item.price || item.totalPrice || 0) * (item.quantity || 1)).toFixed(0)}
                           </span>
-                          <ItemStatusBadge status={mapFoodOrderStatus(item)} />
+                          <ItemStatusBadge status={mapFoodOrderStatus(item, true)} />
                         </div>
                       </div>
                     ))}

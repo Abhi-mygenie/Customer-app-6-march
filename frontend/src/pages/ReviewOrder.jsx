@@ -162,16 +162,25 @@ const ReviewOrder = () => {
   const [isLoadingToken, setIsLoadingToken] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
+  // Normalize phone to E.164 format for PhoneInput component
+  const normalizePhone = (phone) => {
+    if (!phone) return '';
+    const digits = phone.replace(/\D/g, '');
+    if (phone.startsWith('+')) return phone; // Already E.164
+    if (digits.length === 10) return `+91${digits}`; // Indian 10-digit
+    if (digits.startsWith('91') && digits.length === 12) return `+${digits}`; // 91XXXXXXXXXX
+    return phone;
+  };
+
   // Pre-fill from guest capture (localStorage)
   useEffect(() => {
-    // Only pre-fill if not authenticated (guest user)
     if (!isAuthenticated) {
       try {
         const savedGuest = localStorage.getItem('guestCustomer');
         if (savedGuest) {
           const { name, phone } = JSON.parse(savedGuest);
           if (name && !customerName) setCustomerName(name);
-          if (phone && !customerPhone) setCustomerPhone(phone);
+          if (phone && !customerPhone) setCustomerPhone(normalizePhone(phone));
         }
       } catch (e) {
         // Ignore parse errors
@@ -183,7 +192,7 @@ const ReviewOrder = () => {
   useEffect(() => {
     if (isAuthenticated && isCustomer && user) {
       if (user.name && !customerName) setCustomerName(user.name);
-      if (user.phone && !customerPhone) setCustomerPhone(user.phone);
+      if (user.phone && !customerPhone) setCustomerPhone(normalizePhone(user.phone));
     }
   }, [isAuthenticated, isCustomer, user]);
 

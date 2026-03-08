@@ -92,7 +92,6 @@ const CustomerDetails = ({
         <div className="customer-details-input-group">
           {/* <label className="customer-details-label">Phone Number</label> */}
           <PhoneInput
-            international
             defaultCountry="IN"
             value={phoneValue}
             onChange={handlePhoneChange}

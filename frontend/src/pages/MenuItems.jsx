@@ -512,7 +512,7 @@ const MenuItems = () => {
                   onClick={clearEditMode}
                   data-testid="cancel-edit-mode-btn"
                 >
-                  Cancel
+                  Clear Cart
                 </button>
               </div>
             </div>

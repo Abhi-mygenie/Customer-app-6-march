@@ -160,13 +160,11 @@ const ReviewOrder = () => {
   const [isLoadingToken, setIsLoadingToken] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
-  // Normalize phone to E.164 format for PhoneInput component
-  const normalizePhone = (phone) => {
+  // Strip country code prefix from phone for PhoneInput (it handles country code via flag dropdown)
+  const stripCountryCode = (phone) => {
     if (!phone) return '';
-    const digits = phone.replace(/\D/g, '');
-    if (phone.startsWith('+')) return phone; // Already E.164
-    if (digits.length === 10) return `+91${digits}`; // Indian 10-digit
-    if (digits.startsWith('91') && digits.length === 12) return `+${digits}`; // 91XXXXXXXXXX
+    if (phone.startsWith('+91')) return phone.slice(3);
+    if (phone.startsWith('91') && phone.length > 10) return phone.slice(2);
     return phone;
   };
 
@@ -178,7 +176,7 @@ const ReviewOrder = () => {
         if (savedGuest) {
           const { name, phone } = JSON.parse(savedGuest);
           if (name && !customerName) setCustomerName(name);
-          if (phone && !customerPhone) setCustomerPhone(normalizePhone(phone));
+          if (phone && !customerPhone) setCustomerPhone(stripCountryCode(phone));
         }
       } catch (e) {
         // Ignore parse errors
@@ -190,7 +188,7 @@ const ReviewOrder = () => {
   useEffect(() => {
     if (isAuthenticated && isCustomer && user) {
       if (user.name && !customerName) setCustomerName(user.name);
-      if (user.phone && !customerPhone) setCustomerPhone(normalizePhone(user.phone));
+      if (user.phone && !customerPhone) setCustomerPhone(stripCountryCode(user.phone));
     }
   }, [isAuthenticated, isCustomer, user]);
 

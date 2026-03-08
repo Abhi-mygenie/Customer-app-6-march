@@ -148,9 +148,7 @@ const ReviewOrder = () => {
   const [tableNumber, setTableNumber] = useState('');
   const [roomOrTable, setRoomOrTable] = useState(null); // 'room' | 'table' | null
   const [specialInstructions, setSpecialInstructions] = useState('');
-  const [couponCode, setCouponCode] = useState('0');
-  const [loyaltyPoints] = useState('1'); // Placeholder: "You have ₹1..."
-  // const [loyaltyPoints, setLoyaltyPoints] = useState('1'); 
+  const [couponCode, setCouponCode] = useState('');
 
   // Loyalty settings for points calculation
   const [loyaltySettings, setLoyaltySettings] = useState(null);
@@ -970,9 +968,15 @@ const ReviewOrder = () => {
                 <div className="price-row price-row-input">
                   <div className="price-input-group">
                     <span className="price-input-icon">🎁</span>
-                    <span className="price-loyalty-text">₹{loyaltyPoints} points available</span>
+                    <span className="price-loyalty-text">
+                      {user?.total_points || 0} points
+                      {loyaltySettings?.redemption_value 
+                        ? ` (Worth ₹${((user?.total_points || 0) * loyaltySettings.redemption_value).toFixed(0)})`
+                        : ''
+                      }
+                    </span>
                   </div>
-                  <button className="price-inline-btn" data-testid="redeem-loyalty-btn">Use</button>
+                  <button className="price-inline-btn" data-testid="redeem-loyalty-btn" disabled={!user?.total_points}>Use</button>
                 </div>
               )}
 

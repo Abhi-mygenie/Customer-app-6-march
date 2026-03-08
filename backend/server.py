@@ -1003,6 +1003,43 @@ async def get_loyalty_settings(restaurant_id: str):
         "first_visit_bonus_points": settings.get("first_visit_bonus_points", 50)
     }
 
+@api_router.get("/customer-lookup/{restaurant_id}")
+async def customer_lookup(restaurant_id: str, phone: str):
+    """Look up customer by phone number for a restaurant — returns name, points, tier"""
+    user_id = f"pos_0001_restaurant_{restaurant_id}"
+    
+    # Normalize phone
+    normalized = phone.strip()
+    if normalized.startswith('+91'):
+        normalized = normalized[3:]
+    elif normalized.startswith('91') and len(normalized) > 10:
+        normalized = normalized[2:]
+    
+    customer = await db.customers.find_one(
+        {"$or": [{"phone": phone.strip(), "user_id": user_id}, {"phone": normalized, "user_id": user_id}]},
+        {"_id": 0, "name": 1, "phone": 1, "total_points": 1, "tier": 1, "wallet_balance": 1, "country_code": 1}
+    )
+    
+    if customer:
+        return {
+            "found": True,
+            "name": customer.get("name", ""),
+            "phone": customer.get("phone", ""),
+            "country_code": customer.get("country_code", "+91"),
+            "total_points": customer.get("total_points", 0),
+            "tier": customer.get("tier", "Bronze"),
+            "wallet_balance": customer.get("wallet_balance", 0.0),
+        }
+    
+    return {
+        "found": False,
+        "name": "",
+        "phone": normalized,
+        "total_points": 0,
+        "tier": "Bronze",
+        "wallet_balance": 0.0,
+    }
+
 # ============================================
 # Include all routers
 # ============================================

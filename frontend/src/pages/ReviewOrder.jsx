@@ -153,6 +153,10 @@ const ReviewOrder = () => {
   // Loyalty settings for points calculation
   const [loyaltySettings, setLoyaltySettings] = useState(null);
 
+  // Customer lookup state (phone-based identification)
+  const [lookedUpCustomer, setLookedUpCustomer] = useState(null); // { found, name, total_points, tier }
+  const [isLookingUp, setIsLookingUp] = useState(false);
+
   const [showPhoneError, setShowPhoneError] = useState(false);
 
   // Token management state
@@ -189,8 +193,52 @@ const ReviewOrder = () => {
     if (isAuthenticated && isCustomer && user) {
       if (user.name && !customerName) setCustomerName(user.name);
       if (user.phone && !customerPhone) setCustomerPhone(stripCountryCode(user.phone));
+      // Set looked up customer from auth user data
+      setLookedUpCustomer({
+        found: true,
+        name: user.name || '',
+        total_points: user.total_points || 0,
+        tier: user.tier || 'Bronze',
+      });
     }
   }, [isAuthenticated, isCustomer, user]);
+
+  // Phone-based customer lookup (debounced)
+  useEffect(() => {
+    if (isAuthenticated && isCustomer) return; // Skip if already logged in
+    if (!customerPhone || !numericRestaurantId) return;
+
+    // Extract bare digits from phone value
+    const digits = customerPhone.replace(/\D/g, '');
+    // Check for 10 digits (or 12 with country code)
+    const bareDigits = digits.startsWith('91') && digits.length === 12 ? digits.slice(2) : digits;
+    if (bareDigits.length !== 10) {
+      setLookedUpCustomer(null);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsLookingUp(true);
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/customer-lookup/${numericRestaurantId}?phone=${bareDigits}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setLookedUpCustomer(data);
+          if (data.found && data.name) {
+            setCustomerName(data.name);
+          }
+        }
+      } catch (error) {
+        console.error('Customer lookup failed:', error);
+      } finally {
+        setIsLookingUp(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [customerPhone, numericRestaurantId, isAuthenticated, isCustomer]);
 
   // Validate phone number (10 digits for India)
   const isPhoneNumberValid = useMemo(() => {
@@ -963,19 +1011,21 @@ const ReviewOrder = () => {
 
               {/* Loyalty Points - inline */}
               {showLoyalty && (
-                <div className="price-row price-row-input">
-                  <div className="price-input-group">
-                    <span className="price-input-icon">🎁</span>
-                    <span className="price-loyalty-text">
-                      {user?.total_points || 0} points
-                      {loyaltySettings?.redemption_value 
-                        ? ` (Worth ₹${((user?.total_points || 0) * loyaltySettings.redemption_value).toFixed(0)})`
-                        : ''
-                      }
-                    </span>
-                  </div>
-                  <button className="price-inline-btn" data-testid="redeem-loyalty-btn" disabled={!user?.total_points}>Use</button>
-                </div>
+                (() => {
+                  const pts = isAuthenticated ? (user?.total_points || 0) : (lookedUpCustomer?.total_points || 0);
+                  const rdv = loyaltySettings?.redemption_value || 0;
+                  return (
+                    <div className="price-row price-row-input">
+                      <div className="price-input-group">
+                        <span className="price-input-icon">🎁</span>
+                        <span className="price-loyalty-text">
+                          {pts} points{rdv ? ` (Worth ₹${(pts * rdv).toFixed(0)})` : ''}
+                        </span>
+                      </div>
+                      <button className="price-inline-btn" data-testid="redeem-loyalty-btn" disabled={!pts}>Use</button>
+                    </div>
+                  );
+                })()
               )}
 
               {/* GST/VAT if applicable */}
@@ -1007,59 +1057,11 @@ const ReviewOrder = () => {
           </div>
           )}
 
-          {/* Login for Rewards Prompt - Show only if not logged in */}
-          {!isAuthenticated && loyaltySettings && (
+          {/* Customer Rewards Info — shown for any identified customer (via login or phone lookup) */}
+          {(isAuthenticated || lookedUpCustomer) && loyaltySettings && (
             (() => {
-              // Calculate points to earn (using bronze tier for guests)
-              const earnPercent = loyaltySettings.bronze_earn_percent || 5;
-              const billAmount = totalToPay;
-              const pointsToEarn = Math.round(billAmount * (earnPercent / 100));
-              const redemptionValue = loyaltySettings.redemption_value || 0.25;
-              const pointsWorth = (pointsToEarn * redemptionValue).toFixed(0);
-              const firstVisitBonus = loyaltySettings.first_visit_bonus_enabled ? loyaltySettings.first_visit_bonus_points : 0;
-              const minOrderValue = loyaltySettings.min_order_value || 100;
-              const isEligible = billAmount >= minOrderValue;
-              
-              return (
-                <div className="review-order-login-prompt" data-testid="login-rewards-prompt">
-                  <div className="login-prompt-content">
-                    <IoGiftOutline className="login-prompt-icon" />
-                    <div className="login-prompt-text">
-                      {isEligible ? (
-                        <>
-                          <span className="login-prompt-title">
-                            Earn {pointsToEarn} points on this order!
-                          </span>
-                          <span className="login-prompt-subtitle">
-                            Worth ₹{pointsWorth}{firstVisitBonus > 0 ? ` + ${firstVisitBonus} bonus points for first visit` : ''}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="login-prompt-title">Earn rewards on this order!</span>
-                          <span className="login-prompt-subtitle">
-                            Add ₹{(minOrderValue - billAmount).toFixed(0)} more to earn points
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <button 
-                    className="login-prompt-btn"
-                    onClick={() => navigate('/login')}
-                    data-testid="login-rewards-btn"
-                  >
-                    Login
-                  </button>
-                </div>
-              );
-            })()
-          )}
-
-          {/* Logged In User Info - Show points to earn */}
-          {isAuthenticated && isCustomer && user && loyaltySettings && (
-            (() => {
-              const tier = (user.tier || 'Bronze').toLowerCase();
+              const custTier = isAuthenticated ? (user?.tier || 'Bronze') : (lookedUpCustomer?.tier || 'Bronze');
+              const tier = custTier.toLowerCase();
               const earnPercent = loyaltySettings[`${tier}_earn_percent`] || loyaltySettings.bronze_earn_percent || 5;
               const billAmount = totalToPay;
               const minOrderValue = loyaltySettings.min_order_value || 100;
@@ -1067,6 +1069,8 @@ const ReviewOrder = () => {
               const pointsToEarn = Math.round(billAmount * (earnPercent / 100));
               const redemptionValue = loyaltySettings.redemption_value || 0.25;
               const pointsWorth = (pointsToEarn * redemptionValue).toFixed(0);
+              const isNewCustomer = lookedUpCustomer && !lookedUpCustomer.found;
+              const firstVisitBonus = isNewCustomer && loyaltySettings.first_visit_bonus_enabled ? loyaltySettings.first_visit_bonus_points : 0;
 
               return (
                 <div className="review-order-user-info" data-testid="logged-in-user-info">
@@ -1078,7 +1082,9 @@ const ReviewOrder = () => {
                           <span className="user-info-name">
                             Earn {pointsToEarn} points on this order!
                           </span>
-                          <span className="user-info-points">Worth ₹{pointsWorth}</span>
+                          <span className="user-info-points">
+                            Worth ₹{pointsWorth}{firstVisitBonus > 0 ? ` + ${firstVisitBonus} bonus points for first visit` : ''}
+                          </span>
                         </>
                       ) : (
                         <>
@@ -1095,17 +1101,61 @@ const ReviewOrder = () => {
             })()
           )}
 
-          {/* Logged In - No loyalty settings fallback */}
-          {isAuthenticated && isCustomer && user && !loyaltySettings && (
+          {/* No loyalty settings fallback */}
+          {(isAuthenticated || lookedUpCustomer) && !loyaltySettings && (
             <div className="review-order-user-info" data-testid="logged-in-user-info">
               <div className="user-info-content">
                 <IoGiftOutline className="user-info-icon" />
                 <div className="user-info-text">
-                  <span className="user-info-name">Hi, {user.name?.split(' ')[0] || 'there'}!</span>
-                  <span className="user-info-points">{user.total_points || 0} points available</span>
+                  <span className="user-info-name">
+                    Hi, {(isAuthenticated ? user?.name?.split(' ')[0] : lookedUpCustomer?.name?.split(' ')[0]) || 'there'}!
+                  </span>
+                  <span className="user-info-points">
+                    {(isAuthenticated ? user?.total_points : lookedUpCustomer?.total_points) || 0} points available
+                  </span>
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Guest prompt — only if no phone entered and not logged in */}
+          {!isAuthenticated && !lookedUpCustomer && loyaltySettings && (
+            (() => {
+              const earnPercent = loyaltySettings.bronze_earn_percent || 5;
+              const billAmount = totalToPay;
+              const pointsToEarn = Math.round(billAmount * (earnPercent / 100));
+              const redemptionValue = loyaltySettings.redemption_value || 0.25;
+              const pointsWorth = (pointsToEarn * redemptionValue).toFixed(0);
+              const minOrderValue = loyaltySettings.min_order_value || 100;
+              const isEligible = billAmount >= minOrderValue;
+
+              return (
+                <div className="review-order-login-prompt" data-testid="login-rewards-prompt">
+                  <div className="login-prompt-content">
+                    <IoGiftOutline className="login-prompt-icon" />
+                    <div className="login-prompt-text">
+                      {isEligible ? (
+                        <>
+                          <span className="login-prompt-title">
+                            Earn {pointsToEarn} points on this order!
+                          </span>
+                          <span className="login-prompt-subtitle">
+                            Worth ₹{pointsWorth} — enter your phone number above
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="login-prompt-title">Earn rewards on this order!</span>
+                          <span className="login-prompt-subtitle">
+                            Add ₹{(minOrderValue - billAmount).toFixed(0)} more to earn points
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
           )}
         </div>
 

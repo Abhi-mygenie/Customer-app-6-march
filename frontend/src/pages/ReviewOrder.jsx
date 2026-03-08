@@ -1058,8 +1058,47 @@ const ReviewOrder = () => {
             })()
           )}
 
-          {/* Logged In User Info */}
-          {isAuthenticated && isCustomer && user && (
+          {/* Logged In User Info - Show points to earn */}
+          {isAuthenticated && isCustomer && user && loyaltySettings && (
+            (() => {
+              const tier = (user.tier || 'Bronze').toLowerCase();
+              const earnPercent = loyaltySettings[`${tier}_earn_percent`] || loyaltySettings.bronze_earn_percent || 5;
+              const billAmount = totalToPay;
+              const minOrderValue = loyaltySettings.min_order_value || 100;
+              const isEligible = billAmount >= minOrderValue;
+              const pointsToEarn = Math.round(billAmount * (earnPercent / 100));
+              const redemptionValue = loyaltySettings.redemption_value || 0.25;
+              const pointsWorth = (pointsToEarn * redemptionValue).toFixed(0);
+
+              return (
+                <div className="review-order-user-info" data-testid="logged-in-user-info">
+                  <div className="user-info-content">
+                    <IoGiftOutline className="user-info-icon" />
+                    <div className="user-info-text">
+                      {isEligible ? (
+                        <>
+                          <span className="user-info-name">
+                            Earn {pointsToEarn} points on this order!
+                          </span>
+                          <span className="user-info-points">Worth ₹{pointsWorth}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="user-info-name">Almost there!</span>
+                          <span className="user-info-points">
+                            Add ₹{(minOrderValue - billAmount).toFixed(0)} more to earn points
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()
+          )}
+
+          {/* Logged In - No loyalty settings fallback */}
+          {isAuthenticated && isCustomer && user && !loyaltySettings && (
             <div className="review-order-user-info" data-testid="logged-in-user-info">
               <div className="user-info-content">
                 <IoGiftOutline className="user-info-icon" />

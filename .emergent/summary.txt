@@ -1,0 +1,178 @@
+<analysis>**original_problem_statement**: The user wants to pull and build a GitHub repository: . The subsequent conversation involved extensive debugging and feature additions to this application.
+
+**PRODUCT REQUIREMENTS**:
+*   Build and run the application from the provided GitHub repository.
+*   Import existing database data.
+*   Fix UI/UX issues on the Order Success and Review Order pages.
+*   Implement UI changes for a cleaner Price Breakdown.
+*   Implement a feature to show potential loyalty points earned on an order.
+*   Ensure data consistency across different views (Cart, Review, Order Success).
+*   Fix phone number country code display issues.
+*   Implement a phone-based customer lookup to auto-populate user data on the review order page.
+*   Ensure tax calculation respects both item-level and outlet-level configurations.
+
+**User's preferred language**: English
+
+**what currently exists?**
+The agent has successfully built and deployed a full-stack Restaurant Customer App (React frontend, FastAPI backend). The application is heavily dependent on an external API () for core functionalities.
+
+In this session, the agent has implemented several key features and fixes:
+1.  Fixed a UI glitch on the Order Success page that caused a full-page refresh during status updates.
+2.  Corrected a phone number input bug where the country code was being duplicated in the UI.
+3.  Enhanced the loyalty/coupon section on the Review Order page to show a user's actual points and their monetary value, and to display dynamic earn points messages.
+4.  Implemented a major new feature: a phone-based customer lookup. When a user enters their phone number, the app now calls a new backend endpoint to fetch their details (name, points, tier), auto-fills the name field, and applies their specific loyalty settings. If the customer is not found, they are treated as a new customer with default (Bronze tier) settings.
+5.  Made several UI tweaks, including making the Previously Ordered section more compact and changing a Cancel button to Clear Cart.
+
+**Last working item**:
+*   **Last item agent was working**: The agent just finished implementing the phone-based customer lookup feature. This involved creating a new backend endpoint () and adding significant state management and API call logic to the  component.
+*   **Status**: USER VERIFICATION PENDING
+*   **Agent Testing Done**: Y (Agent tested the backend endpoint with  and confirmed the frontend flow conceptually.)
+*   **Which testing method agent to use?**: Frontend testing agent
+*   **User Testing Done**: N
+
+**All Pending/In progress Issue list**:
+*   **Issue 1**: Incorrect tax calculation logic. (Priority: P0)
+*   **Issue 2**: Missing order status mapping for code . (Priority: P1)
+*   **Issue 3**: Cart items persist after placing an order. (Priority: P2)
+
+**Issues Detail**:
+*   **Issue 1**: Incorrect tax calculation logic
+    *   **Description**: The application currently calculates tax based *only* on item-level tax data (). The agent discovered that for some restaurants (e.g., ID 478), the tax is defined at the outlet level (). For these restaurants, the tax is incorrectly calculated as zero. The user confirmed the agent's analysis that the logic needs to be fixed.
+    *   **Attempted fixes**: None. The agent analyzed the problem but did not implement the fix.
+    *   **Next debug checklist**:
+        1.  In , access the restaurant info data (which seems to be in the  object from ).
+        2.  In the  calculation logic, check .
+        3.  If it is , use the outlet-level tax percentage () to calculate tax on the subtotal.
+        4.  If it is  or another value, retain the existing logic of summing up item-level taxes.
+    *   **Why fix this issue and what will be achieved with the fix?**: This is a critical bug causing incorrect billing for certain restaurants. Fixing it will ensure the Grand Total is calculated correctly according to the restaurant's specific tax configuration.
+    *   **Status**: NOT STARTED
+    *   **Is recurring issue?**: N
+    *   **Should Test frontend/backend/both after fix?**: Frontend
+    *   **Blocked on other issue**: None.
+
+*   **Issue 2**: Missing order status mapping for code .
+    *   **Description**: The frontend status mapping object in  and  does not have an entry for .
+    *   **Attempted fixes**: None. The agent asked the user what this status represents but has not received a response.
+    *   **Next debug checklist**: Ask the user to clarify the meaning of  so it can be added to the .
+    *   **Why fix this issue and what will be achieved with the fix?**: To ensure all order statuses are displayed correctly to the user.
+    *   **Status**: BLOCKED (Awaiting user input)
+    *   **Is recurring issue?**: N
+    *   **Should Test frontend/backend/both after fix?**: Frontend
+    *   **Blocked on other issue**: User response.
+
+*   **Issue 3**: Cart items persist after placing an order.
+    *   **Description**: A user previously reported that cart items sometimes remain even after an order is successfully placed, which is unexpected.
+    *   **Attempted fixes**: None in this session. The previous agent noted  is called, but there might be an unhandled edge case.
+    *   **Next debug checklist**: Review the  and  functions in . Check if any error conditions (e.g., silent API failure) could prevent  from executing.
+    *   **Why fix this issue and what will be achieved with the fix?**: To ensure an intuitive user experience where the cart is reliably cleared after checkout.
+    *   **Status**: NOT STARTED
+    *   **Is recurring issue?**: Y
+    *   **Should Test frontend/backend/both after fix?**: Frontend
+    *   **Blocked on other issue**: None.
+
+**In progress Task List**:
+None.
+
+**Upcoming and Future Tasks**
+*   **Upcoming Tasks**:
+    *   **P0: Fix Tax Calculation Logic**: Implement the fix for Issue #1.
+    *   **P1: Implement Apply Coupon Code functionality**: The UI placeholder exists in . The task involves adding logic to validate a coupon and apply the discount to the subtotal.
+    *   **P1: Implement Use Loyalty Points functionality**: The UI exists. The task requires allowing a user to apply their available loyalty points as a discount against the subtotal.
+
+**Completed work in this session**
+- **Feature: Phone-based Customer Lookup (, )**: Implemented a new backend endpoint and frontend logic to look up customers by phone number, auto-filling their name and applying their specific loyalty tier and points.
+- **Bugfix: Phone Number UI (, )**: Fixed an issue where the  country code was being duplicated in the phone input field.
+- **Bugfix: Order Status Page Refresh ()**: Prevented a jarring full-page refresh on status updates by implementing a smoother background polling mechanism.
+- **UI/UX Enhancement: Loyalty & Earn Points Section ()**: Updated the UI to show a logged-in user's actual points balance, its monetary value, and a dynamic message about points they can earn on the current order.
+- **UI/UX Enhancement: Compact Previous Order View (, )**: Restyled the Previously Ordered list to be more compact and readable.
+- **UI/UX Enhancement: Button Label ()**: Changed the Cancel button text in edit mode to the more descriptive Clear Cart.
+
+**Earlier issues found/mentioned but not fixed**
+*   **Issue 1**: Incorrect tax calculation logic (now listed in ).
+*   **Issue 2**: Cart items persist after placing an order (now listed in ).
+
+**Known issue recurrence from previous fork**
+None.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+*   **Frontend**: React, React Router, React Context API, Axios.
+*   **Backend**: Python, FastAPI.
+*   **Database**: MongoDB.
+*   **State Management**: A mix of React Context (, ) and  persists user state. This is complex and a source of bugs.
+*   **External API**: The app's core logic relies on an external  API.
+
+**key DB schema**
+*   **users**: Restaurant owner/admin details.
+*   **customers**: Customer data (, , , , ).
+*   **loyalty_settings**: Loyalty program rules per restaurant.
+*   **customer_app_config**: UI configuration per restaurant.
+*   **orders**: Order history.
+
+**changes in tech stack**
+None.
+
+**All files of reference**
+*   : Heavily modified for the phone lookup feature, loyalty display, and tax logic analysis.
+*   : Modified to add the new customer lookup endpoint.
+*   : Modified to fix the page refresh glitch.
+*   : Modified to fix the phone input UI.
+*   : Modified to change button text.
+*   : Modified for UI compaction.
+*   : New styles for the compact UI.
+
+**Areas that need refactoring**
+*   The  component has become extremely large and complex, managing multiple states, effects, and API calls. It should be broken down into smaller, more manageable custom hooks and components to improve readability and maintainability.
+*   The global state management spread across , , and  remains a fragile area prone to bugs.
+
+**key api endpoints**
+*   **Internal Backend**:
+    *   
+    *    (New)
+*   **External MyGenie API ()**:
+    *   
+    *   
+    *   
+
+**Critical Info for New Agent**
+*   **Tax Calculation is Bugged**: The top priority is to fix the tax calculation logic (Issue #1). The current implementation is wrong for restaurants using outlet-level tax, leading to incorrect grand totals.
+*   **State Management Fragility**: Be extremely cautious when working in . Its state is complex, and changes can have unintended side effects.
+*   **External API Dependency**: The app cannot function without the  API. Most core logic is handled there.
+
+**documents and test reports created in this job**
+None.
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **user**: Asks for the highest point earner at Kunafa Mahal and their phone number.
+2.  **agent**: Provides the customer's name, phone, and point balance.
+3.  **user**: Requests a new feature: when a phone number is entered, it should fetch the customer's details (name, loyalty info) and treat them as logged in. (Image provided)
+4.  **agent**: Summarizes the proposed feature: add a backend lookup endpoint and frontend logic to call it on phone input, then auto-populate data.
+5.  **user**: Clarifies that if a customer is not found, they should be treated as a *new* customer (earning default points), not a guest who can't earn points.
+6.  **agent**: Provides a revised summary incorporating the user's clarification.
+7.  **user**: yes (Approves the plan).
+8.  **agent**: Implements the backend endpoint and all frontend changes for the customer lookup feature.
+9.  **agent**: Confirms completion of the feature.
+10. **agent**: Posts a final summary of the implemented feature.
+
+**Project Health Check:**
+*   **Broken**: The tax calculation logic is fundamentally flawed for certain restaurant configurations. The state management in  is fragile and complex.
+*   **Mocked**: None.
+
+**3rd Party Integrations**
+*   **MyGenie API**: A proprietary REST API hosted at , used for all core order management.
+
+**Testing status**
+*   **Testing agent used after significant changes**: NO
+*   **Troubleshoot agent used after agent stuck in loop**: NO
+*   **Test files created**: []
+*   **Known regressions**: None identified in this session, but the fragile state management poses a risk.
+
+**Credentials to test flow:**
+*   **Demo User**:  / .
+*   **Guest Access**: Available for browsing and ordering.
+*   **Test Phone (Existing Customer)**: For Kunafa Mahal (restaurant_id 689), use phone  (Customer: Prvesh) to test the new customer lookup feature.
+
+**What agent forgot to execute**
+*   The agent did not implement the fix for the **critical tax calculation bug**. After analyzing the problem and getting user confirmation, the agent pivoted to other tasks and never returned to fix it. This should be the next immediate action.</analysis>

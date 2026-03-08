@@ -129,16 +129,14 @@ const OrderSuccess = () => {
   const totalItemsCount = allItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   // Fetch order details and update item statuses
-  const fetchOrderStatus = async () => {
+  const fetchOrderStatus = async (isInitial = false) => {
     if (!orderId) return;
     
     try {
-      setIsLoadingStatus(true);
+      if (isInitial) setIsLoadingStatus(true);
       const orderDetails = await getOrderDetails(orderId);
-      console.log('[OrderSuccess] API response:', orderDetails);
       
       if (orderDetails?.previousItems && orderDetails.previousItems.length > 0) {
-        // Use items directly from API - already has f_order_status
         const updatedItems = orderDetails.previousItems.map(item => ({
           id: item.id,
           name: item.item?.name || 'Item',
@@ -147,13 +145,12 @@ const OrderSuccess = () => {
           veg: item.item?.veg === true || item.item?.veg === 1,
           f_order_status: item.f_order_status,
         }));
-        console.log('[OrderSuccess] Mapped items:', updatedItems);
         setLiveOrderItems(updatedItems);
       }
     } catch (error) {
       console.error('Failed to fetch order status:', error);
     } finally {
-      setIsLoadingStatus(false);
+      if (isInitial) setIsLoadingStatus(false);
     }
   };
 
@@ -161,12 +158,12 @@ const OrderSuccess = () => {
   useEffect(() => {
     if (!orderId) return;
 
-    // Initial fetch
-    fetchOrderStatus();
+    // Initial fetch (shows loading state)
+    fetchOrderStatus(true);
 
-    // Set up polling every 60 seconds
+    // Poll every 60 seconds (silent update, no loading flash)
     const pollInterval = setInterval(() => {
-      fetchOrderStatus();
+      fetchOrderStatus(false);
     }, 60000);
 
     // Cleanup on unmount

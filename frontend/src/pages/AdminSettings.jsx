@@ -16,7 +16,9 @@ import {
   IoDocumentOutline,
   IoEyeOutline,
   IoRestaurantOutline,
-  IoTextOutline
+  IoTextOutline,
+  IoSettingsOutline,
+  IoTimeOutline
 } from 'react-icons/io5';
 import toast from 'react-hot-toast';
 import ContentTab from '../components/AdminSettings/ContentTab';
@@ -472,6 +474,7 @@ const AdminSettings = () => {
     { id: 'content', label: 'Content', icon: IoDocumentOutline },
     { id: 'visibility', label: 'Visibility', icon: IoEyeOutline },
     { id: 'customText', label: 'Custom Text', icon: IoTextOutline },
+    { id: 'settings', label: 'Settings', icon: IoSettingsOutline },
     { id: 'menu', label: 'Menu', icon: IoRestaurantOutline, navigateTo: 'menu' },
   ];
 
@@ -1224,10 +1227,24 @@ const AdminSettings = () => {
             />
             <span className="form-hint">Label for the main button on the landing page (default: "Browse Menu")</span>
           </div>
+        </div>
+      )}
+
+      {/* Settings Section */}
+      {activeSection === 'settings' && (
+        <div className="settings-section" data-testid="section-settings">
+          <h3 className="section-title">
+            <IoSettingsOutline className="section-icon" />
+            Settings
+          </h3>
+          <p className="section-description">Configure restaurant operating hours and other settings</p>
 
           <div className="form-group">
-            <label className="form-label">Restaurant Operating Hours</label>
-            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <label className="form-label">
+              <IoTimeOutline style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+              Restaurant Operating Hours
+            </label>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', marginTop: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Opening:</span>
                 <input

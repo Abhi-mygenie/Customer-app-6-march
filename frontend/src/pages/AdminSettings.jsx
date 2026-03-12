@@ -133,7 +133,7 @@ const AdminSettings = () => {
   
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeSection, setActiveSection] = useState('branding');
+  const [activeSection, setActiveSection] = useState('settings');
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [uploadingBackgroundImage, setUploadingBackgroundImage] = useState(false);
@@ -469,12 +469,11 @@ const AdminSettings = () => {
 
   // Section navigation tabs
   const sections = [
+    { id: 'settings', label: 'Settings', icon: IoSettingsOutline },
     { id: 'branding', label: 'Branding', icon: IoColorPaletteOutline },
+    { id: 'visibility', label: 'Visibility', icon: IoEyeOutline },
     { id: 'banners', label: 'Banners', icon: IoImagesOutline },
     { id: 'content', label: 'Content', icon: IoDocumentOutline },
-    { id: 'visibility', label: 'Visibility', icon: IoEyeOutline },
-    { id: 'customText', label: 'Custom Text', icon: IoTextOutline },
-    { id: 'settings', label: 'Settings', icon: IoSettingsOutline },
     { id: 'menu', label: 'Menu', icon: IoRestaurantOutline, navigateTo: 'menu' },
   ];
 
@@ -541,53 +540,7 @@ const AdminSettings = () => {
             <IoColorPaletteOutline className="section-icon" />
             Branding & Appearance
           </h3>
-          <p className="section-description">Customize your restaurant's look and feel</p>
-          
-          {/* Logo */}
-          <div className="form-group">
-            <label className="form-label">Logo</label>
-            <div className="image-upload-field">
-              <div className="image-url-row">
-                <input
-                  type="url"
-                  className="form-input"
-                  placeholder="https://example.com/logo.png"
-                  value={config.logoUrl || ''}
-                  onChange={(e) => handleChange('logoUrl', e.target.value)}
-                  data-testid="input-logoUrl"
-                />
-                <input
-                  type="file"
-                  ref={logoInputRef}
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const url = await uploadImage(file, setUploadingLogo);
-                    if (url) handleChange('logoUrl', url);
-                    e.target.value = '';
-                  }}
-                />
-                <button
-                  type="button"
-                  className="upload-btn"
-                  onClick={() => logoInputRef.current?.click()}
-                  disabled={uploadingLogo}
-                  data-testid="upload-logo-btn"
-                >
-                  <IoCloudUploadOutline />
-                  {uploadingLogo ? 'Uploading...' : 'Upload'}
-                </button>
-              </div>
-              <span className="form-hint">Paste a URL or upload an image (max 5MB)</span>
-              {config.logoUrl && (
-                <div className="image-preview-box" data-testid="logo-preview">
-                  <img src={config.logoUrl} alt="Logo preview" className="image-preview-img" onError={(e) => e.target.style.display = 'none'} />
-                </div>
-              )}
-            </div>
-          </div>
+          <p className="section-description">Customize your restaurant's colors, fonts, and images</p>
 
           {/* Background Image */}
           <div className="form-group">
@@ -909,33 +862,7 @@ const AdminSettings = () => {
 
           {/* Text Content Sub-section */}
           <div className="form-subsection">
-            <h4 className="form-subsection-title">Text Content</h4>
-
-            <div className="form-group">
-              <label className="form-label">Welcome Message</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Welcome to our restaurant!"
-                value={config.welcomeMessage || ''}
-                onChange={(e) => handleChange('welcomeMessage', e.target.value)}
-                data-testid="input-welcomeMessage"
-              />
-              <span className="form-hint">Main heading shown on landing page</span>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Tagline</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Your tagline here"
-                value={config.tagline || ''}
-                onChange={(e) => handleChange('tagline', e.target.value)}
-                data-testid="input-tagline"
-              />
-              <span className="form-hint">Secondary text shown below welcome message</span>
-            </div>
+            <h4 className="form-subsection-title">Contact & Social</h4>
 
             <div className="form-group">
               <label className="form-label">Phone Number</label>
@@ -1206,15 +1133,90 @@ const AdminSettings = () => {
         <ContentTab config={config} setConfig={setConfig} token={token} uploadImage={uploadImage} ToggleRow={ToggleRow} handleChange={handleChange} />
       )}
 
-      {/* Custom Text Section */}
-      {activeSection === 'customText' && (
-        <div className="settings-section" data-testid="section-custom-text">
+      {/* Settings Section */}
+      {activeSection === 'settings' && (
+        <div className="settings-section" data-testid="section-settings">
           <h3 className="section-title">
-            <IoTextOutline className="section-icon" />
-            Custom Text
+            <IoSettingsOutline className="section-icon" />
+            Settings
           </h3>
-          <p className="section-description">Customize button labels and text shown in the app</p>
+          <p className="section-description">Configure your restaurant's basic settings and appearance</p>
 
+          {/* Logo */}
+          <div className="form-group">
+            <label className="form-label">Logo</label>
+            <div className="image-upload-field">
+              <div className="image-url-row">
+                <input
+                  type="url"
+                  className="form-input"
+                  placeholder="https://example.com/logo.png"
+                  value={config.logoUrl || ''}
+                  onChange={(e) => handleChange('logoUrl', e.target.value)}
+                  data-testid="input-logoUrl-settings"
+                />
+                <input
+                  type="file"
+                  ref={logoInputRef}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const url = await uploadImage(file, setUploadingLogo);
+                    if (url) handleChange('logoUrl', url);
+                    e.target.value = '';
+                  }}
+                />
+                <button
+                  type="button"
+                  className="upload-btn"
+                  onClick={() => logoInputRef.current?.click()}
+                  disabled={uploadingLogo}
+                  data-testid="upload-logo-btn-settings"
+                >
+                  <IoCloudUploadOutline />
+                  {uploadingLogo ? 'Uploading...' : 'Upload'}
+                </button>
+              </div>
+              <span className="form-hint">Paste a URL or upload an image (max 5MB)</span>
+              {config.logoUrl && (
+                <div className="image-preview-box" data-testid="logo-preview-settings">
+                  <img src={config.logoUrl} alt="Logo preview" className="image-preview-img" onError={(e) => e.target.style.display = 'none'} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Welcome Message */}
+          <div className="form-group">
+            <label className="form-label">Welcome Message</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Welcome to our restaurant!"
+              value={config.welcomeMessage || ''}
+              onChange={(e) => handleChange('welcomeMessage', e.target.value)}
+              data-testid="input-welcomeMessage-settings"
+            />
+            <span className="form-hint">Main heading shown on landing page</span>
+          </div>
+
+          {/* Tagline */}
+          <div className="form-group">
+            <label className="form-label">Tagline</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Your tagline here"
+              value={config.tagline || ''}
+              onChange={(e) => handleChange('tagline', e.target.value)}
+              data-testid="input-tagline-settings"
+            />
+            <span className="form-hint">Secondary text shown below welcome message</span>
+          </div>
+
+          {/* Browse Menu Button Text */}
           <div className="form-group">
             <label className="form-label">Browse Menu Button Text</label>
             <input
@@ -1223,22 +1225,12 @@ const AdminSettings = () => {
               placeholder="Browse Menu"
               value={config.browseMenuButtonText || ''}
               onChange={(e) => handleChange('browseMenuButtonText', e.target.value)}
-              data-testid="input-browseMenuButtonText"
+              data-testid="input-browseMenuButtonText-settings"
             />
             <span className="form-hint">Label for the main button on the landing page (default: "Browse Menu")</span>
           </div>
-        </div>
-      )}
 
-      {/* Settings Section */}
-      {activeSection === 'settings' && (
-        <div className="settings-section" data-testid="section-settings">
-          <h3 className="section-title">
-            <IoSettingsOutline className="section-icon" />
-            Settings
-          </h3>
-          <p className="section-description">Configure restaurant operating hours and other settings</p>
-
+          {/* Restaurant Operating Hours */}
           <div className="form-group">
             <label className="form-label">
               <IoTimeOutline style={{ marginRight: '8px', verticalAlign: 'middle' }} />

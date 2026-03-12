@@ -188,7 +188,7 @@ export const RestaurantConfigProvider = ({ children }) => {
     
     // Primary Color
     {
-      const primary = config.primaryColor || '#E8531E';
+      const primary = config.primaryColor || '#F26B33';
       root.style.setProperty('--color-primary', primary);
       root.style.setProperty('--text-link', primary);
       root.style.setProperty('--border-primary', primary);
@@ -202,7 +202,7 @@ export const RestaurantConfigProvider = ({ children }) => {
     
     // Secondary Color (for hover states, gradients)
     {
-      const secondary = config.secondaryColor || '#2E7D32';
+      const secondary = config.secondaryColor || '#329937';
       root.style.setProperty('--color-primary-dark', secondary);
       root.style.setProperty('--text-link-hover', secondary);
     }
@@ -214,15 +214,17 @@ export const RestaurantConfigProvider = ({ children }) => {
     root.style.setProperty('--bg-primary', config.backgroundColor || '#FFFFFF');
     
     // Text Color (for body text, descriptions, etc.)
-    if (config.textColor) {
-      root.style.setProperty('--text-color', config.textColor);
-      root.style.setProperty('--text-primary', config.textColor);
+    {
+      const textColor = config.textColor || '#4A4A4A';
+      root.style.setProperty('--text-color', textColor);
+      root.style.setProperty('--text-primary', textColor);
     }
     
     // Text Secondary Color (for secondary text)
-    if (config.textSecondaryColor) {
-      root.style.setProperty('--text-secondary-color', config.textSecondaryColor);
-      root.style.setProperty('--text-secondary', config.textSecondaryColor);
+    {
+      const textSecondary = config.textSecondaryColor || '#6B7280';
+      root.style.setProperty('--text-secondary-color', textSecondary);
+      root.style.setProperty('--text-secondary', textSecondary);
     }
     
     // Font Heading
@@ -236,7 +238,7 @@ export const RestaurantConfigProvider = ({ children }) => {
         'Playfair Display': "'Playfair Display', serif",
         'Lato': "'Lato', sans-serif",
       };
-      const font = config.fontHeading || 'Montserrat';
+      const font = config.fontHeading || 'Poppins';
       root.style.setProperty('--font-heading', fontMap[font] || font);
     }
     
@@ -251,7 +253,7 @@ export const RestaurantConfigProvider = ({ children }) => {
         'Inter': "'Inter', sans-serif",
         'Nunito': "'Nunito', sans-serif",
       };
-      const font = config.fontBody || 'Montserrat';
+      const font = config.fontBody || 'Poppins';
       root.style.setProperty('--font-body', fontMap[font] || font);
     }
     

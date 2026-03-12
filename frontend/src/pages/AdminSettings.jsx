@@ -71,15 +71,15 @@ const AdminSettings = () => {
     logoUrl: '',
     backgroundImageUrl: '',          // Desktop background image
     mobileBackgroundImageUrl: '',    // Mobile background image (portrait 9:16)
-    primaryColor: '#61B4E5',
-    secondaryColor: '#4fa3d1',
+    primaryColor: '#F26B33',
+    secondaryColor: '#329937',
     buttonTextColor: '#ffffff',
     backgroundColor: '#ffffff',
-    textColor: '#333333',
-    textSecondaryColor: '#666666',
+    textColor: '#4A4A4A',
+    textSecondaryColor: '#6B7280',
     // Branding - Typography
-    fontHeading: 'Big Shoulders',
-    fontBody: 'Montserrat',
+    fontHeading: 'Poppins',
+    fontBody: 'Poppins',
     // Branding - Style
     borderRadius: 'rounded',
     // Branding - Text

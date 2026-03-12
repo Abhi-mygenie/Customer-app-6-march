@@ -115,6 +115,9 @@ const AdminSettings = () => {
     extraInfoItems: ['', '', '', '', ''],
     // Custom Text
     browseMenuButtonText: 'Browse Menu',
+    // Restaurant Operating Hours
+    restaurantOpeningTime: '06:00',
+    restaurantClosingTime: '03:00',
   });
   
   const [newBanner, setNewBanner] = useState({
@@ -310,6 +313,9 @@ const AdminSettings = () => {
           extraInfoItems: config.extraInfoItems.filter(item => item.trim() !== ''),
           // Custom Text
           browseMenuButtonText: config.browseMenuButtonText,
+          // Restaurant Operating Hours
+          restaurantOpeningTime: config.restaurantOpeningTime,
+          restaurantClosingTime: config.restaurantClosingTime,
         })
       });
 
@@ -1217,6 +1223,35 @@ const AdminSettings = () => {
               data-testid="input-browseMenuButtonText"
             />
             <span className="form-hint">Label for the main button on the landing page (default: "Browse Menu")</span>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Restaurant Operating Hours</label>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Opening:</span>
+                <input
+                  type="time"
+                  className="form-input"
+                  style={{ width: '140px' }}
+                  value={config.restaurantOpeningTime || '06:00'}
+                  onChange={(e) => handleChange('restaurantOpeningTime', e.target.value)}
+                  data-testid="input-restaurantOpeningTime"
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Closing:</span>
+                <input
+                  type="time"
+                  className="form-input"
+                  style={{ width: '140px' }}
+                  value={config.restaurantClosingTime || '03:00'}
+                  onChange={(e) => handleChange('restaurantClosingTime', e.target.value)}
+                  data-testid="input-restaurantClosingTime"
+                />
+              </div>
+            </div>
+            <span className="form-hint">Set restaurant operating hours. The "Add" button will be hidden when restaurant is closed. Default: 6:00 AM - 3:00 AM</span>
           </div>
         </div>
       )}

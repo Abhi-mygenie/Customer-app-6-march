@@ -19,13 +19,14 @@ import { useRestaurantConfig } from '../context/RestaurantConfigContext';
 import { useCart } from '../context/CartContext';
 import { getAllergenIcon } from '../utils/allergenIcons';
 import { useCurrentTime } from '../hooks/useCurrentTime';
+import { isRestaurantOpen } from '../utils/itemAvailability';
 import './MenuItems.css';
 
 const MenuItems = () => {
   const { stationId } = useParams();
   const navigate = useNavigate();
   const { restaurantId } = useRestaurantId();
-  const { showFooter: configShowFooter, showPromotionsOnMenu: configShowPromotionsOnMenu, showCategories: configShowCategories, fetchConfig, logoUrl: configLogoUrl, phone: configPhone, banners: configBanners } = useRestaurantConfig();
+  const { showFooter: configShowFooter, showPromotionsOnMenu: configShowPromotionsOnMenu, showCategories: configShowCategories, fetchConfig, logoUrl: configLogoUrl, phone: configPhone, banners: configBanners, restaurantOpeningTime, restaurantClosingTime } = useRestaurantConfig();
   const [stationName, setStationName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -54,8 +55,9 @@ const MenuItems = () => {
   // Fetch stations for menu panel
   const { stations: stationsData } = useStations(numericRestaurantId);
 
-  // Check if online ordering is enabled
-  const isOnlineOrderEnabled = restaurant?.online_order === 'Yes' || restaurant?.online_order === undefined;
+  // Check if online ordering is enabled AND restaurant is currently open
+  const isOnlineOrderEnabled = (restaurant?.online_order === 'Yes' || restaurant?.online_order === undefined) 
+    && isRestaurantOpen(restaurantOpeningTime, restaurantClosingTime);
 
   // Fetch admin config for this restaurant
   useEffect(() => {

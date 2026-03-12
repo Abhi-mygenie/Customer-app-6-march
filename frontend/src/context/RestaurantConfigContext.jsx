@@ -91,6 +91,9 @@ const DEFAULT_CONFIG = {
   otpRequiredDineInWithTable: false,
   otpRequiredWalkIn: false,
   otpRequiredRoomOrders: false,
+  // Restaurant Operating Hours (for Add button visibility)
+  restaurantOpeningTime: '06:00',  // Default 6:00 AM
+  restaurantClosingTime: '03:00',  // Default 3:00 AM (next day)
 };
 
 export const RestaurantConfigProvider = ({ children }) => {
@@ -397,6 +400,9 @@ export const RestaurantConfigProvider = ({ children }) => {
     otpRequiredDineInWithTable: config.otpRequiredDineInWithTable === true,
     otpRequiredWalkIn: config.otpRequiredWalkIn === true,
     otpRequiredRoomOrders: config.otpRequiredRoomOrders === true,
+    // Restaurant Operating Hours
+    restaurantOpeningTime: config.restaurantOpeningTime || '06:00',
+    restaurantClosingTime: config.restaurantClosingTime || '03:00',
   };
 
   return (

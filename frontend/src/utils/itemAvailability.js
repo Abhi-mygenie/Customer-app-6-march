@@ -92,3 +92,44 @@ export const isItemAvailable = (item, currentTimeInSeconds) => {
     return currentTimeInSeconds >= startSeconds || currentTimeInSeconds <= endSeconds;
   }
 };
+
+/**
+ * Check if restaurant is currently open based on operating hours
+ * @param {string} openingTime - Opening time in "HH:MM" format (e.g., "06:00")
+ * @param {string} closingTime - Closing time in "HH:MM" format (e.g., "03:00")
+ * @returns {boolean} True if restaurant is open
+ * @example
+ * isRestaurantOpen("06:00", "03:00") at 10:00 AM → true
+ * isRestaurantOpen("06:00", "03:00") at 04:00 AM → false
+ */
+export const isRestaurantOpen = (openingTime = '06:00', closingTime = '03:00') => {
+  // If no times provided, assume always open
+  if (!openingTime || !closingTime) {
+    return true;
+  }
+
+  // Get current time
+  const now = new Date();
+  const currentHours = now.getHours();
+  const currentMinutes = now.getMinutes();
+  const currentTimeInMinutes = (currentHours * 60) + currentMinutes;
+
+  // Parse opening time
+  const [openHours, openMinutes] = openingTime.split(':').map(Number);
+  const openingTimeInMinutes = (openHours * 60) + (openMinutes || 0);
+
+  // Parse closing time
+  const [closeHours, closeMinutes] = closingTime.split(':').map(Number);
+  const closingTimeInMinutes = (closeHours * 60) + (closeMinutes || 0);
+
+  // Handle overnight closing (e.g., 06:00 - 03:00)
+  if (closingTimeInMinutes < openingTimeInMinutes) {
+    // Restaurant closes after midnight
+    // Open if: current >= opening OR current < closing
+    return currentTimeInMinutes >= openingTimeInMinutes || currentTimeInMinutes < closingTimeInMinutes;
+  } else {
+    // Normal hours (e.g., 09:00 - 22:00)
+    // Open if: current >= opening AND current < closing
+    return currentTimeInMinutes >= openingTimeInMinutes && currentTimeInMinutes < closingTimeInMinutes;
+  }
+};

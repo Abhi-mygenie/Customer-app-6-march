@@ -5,7 +5,7 @@
 ---
 
 ## 1. Restaurant 478 ("18march") Logo Issue
-- **Current logoUrl in DB**: `https://app5th-march-preview.preview.emergentagent.com/api/uploads/ae2b994cb7184820914d7906200711b3.svg`
+- **Current logoUrl in DB**: `https://loyalty-points-debug-1.preview.emergentagent.com/api/uploads/ae2b994cb7184820914d7906200711b3.svg`
 - Points to an **old preview environment** — will break when that pod is shut down
 - The file (`ae2b994cb7184820914d7906200711b3.svg`) is **NOT present** locally in `/app/backend/uploads/`
 - When it breaks, the app will fall back to `/assets/images/ic_login_logo.png`

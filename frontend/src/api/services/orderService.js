@@ -610,7 +610,7 @@ const buildNormalPayload = (orderData) => {
       cust_name: customerName || '',
       cust_email: '',
       estimatedTime: '',
-      discount_type: pointsRedeemed > 0 ? 'loyalty_points' : '',
+      discount_type: pointsRedeemed > 0 ? 'Loyality' : '',
       // Loyalty points redemption
       points_redeemed: pointsRedeemed,
       points_discount: pointsDiscount
@@ -711,7 +711,7 @@ const build716Payload = (orderData) => {
       cust_name: customerName || '',
       cust_email: '',
       estimatedTime: '',
-      discount_type: pointsRedeemed > 0 ? 'loyalty_points' : '',
+      discount_type: pointsRedeemed > 0 ? 'Loyality' : '',
       // Loyalty points redemption
       points_redeemed: pointsRedeemed,
       points_discount: pointsDiscount,

@@ -388,7 +388,7 @@ async def unified_login(request: LoginRequest):
     Unified login - checks customers first (scoped by restaurant), then restaurant users
     Supports both OTP (for customers) and password (for restaurant admins)
     """
-    identifier = request.phone_or_email.strip()
+    identifier = request.phone_or_email.strip().lower()
     
     # Build user_id for restaurant-scoped customer lookup
     customer = None
